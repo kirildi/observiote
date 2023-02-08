@@ -1,3 +1,5 @@
+![NodeJS](https://github.com/k-d-ivanov/observiote/actions/workflows/nodejs.yml/badge.svg)  
+
 # observiote
 
 Simple IoT devices monitoring App
