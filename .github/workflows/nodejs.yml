@@ -33,4 +33,4 @@ jobs:
     - run: npm install
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
+    #- run: npm test  # currently not test added, enable when oposit
