@@ -1,22 +1,8 @@
 <template>
   <!-- Sidebar/menu -->
-  <div id="mySidebar" class="w3-sidebar w3-bar-block">
-    <div class="w3-row sidebar-header">
-      <div class="w3-col w3-center s6 m6 l12">
-        <img src="../../assets/logo.png" alt="" class="w3-circle sidebar-logo" style="" />
-      </div>
-      <div class="w3-col w3-center s6 m6 l12">
-        <span class="logo-text">OIOTe</span>
-      </div>
-    </div>
+  <div id="mySidebar" class="w3-sidebar">
     <div class="w3-row w3-xlarge w3-center sidebar-box">
       <ul>
-        <li>
-          <router-link :to="{ name: 'dashboard' }" class="w3-bar-item">
-            <em class="fa fa-dashboard fa-fw"> </em>
-            <span class="link-text">Dashboard</span>
-          </router-link>
-        </li>
         <li>
           <router-link :to="{ name: 'devices' }" class="w3-bar-item">
             <em class="fa fa-server fa-fw"> </em>
@@ -43,9 +29,6 @@
         </li>
       </ul>
     </div>
-    <button class="user-logout-button" @click="logout">
-      <em class="fa fa-sign-out"><span class="link-text">Logout</span></em>
-    </button>
   </div>
 </template>
 

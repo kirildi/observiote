@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import SideBar from "../../components/main/SideBar.vue";
-import TabNav from "../../components/main/TabNav.vue";
+import SideBar from "../../components/SideBar.vue";
+import TabNav from "../../components/TabNav.vue";
 
 const isLoggedIn = ref(true);
 </script>
 <template>
   <!-- PAGE CONTENT! -->
-  <div v-if="!isLoggedIn" class="view-container">
+  <div v-if="!isLoggedIn" class="container h-screen">
     <router-view />
   </div>
 
-  <div v-else class="view-container">
+  <div v-else class="container h-screen">
     <tab-nav />
     <side-bar />
     <!-- CONTENT -->
