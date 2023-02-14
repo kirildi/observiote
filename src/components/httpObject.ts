@@ -1,7 +1,10 @@
 import axios from "axios"
+ 
 
 let path = ""
-if (process.env.NODE_ENV === "production") {
+
+if ( import.meta.env.PROD) {
+  
   path = "http://192.168.0.100:8285"
 } else {
   path = "http://localhost:8282"
