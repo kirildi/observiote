@@ -3,7 +3,7 @@ import { ref } from "vue";
 import SideBar from "../../components/SideBar.vue";
 import TabNav from "../../components/TabNav.vue";
 
-const isLoggedIn = ref(true);
+const isLoggedIn = ref(false);
 </script>
 <template>
   <!-- PAGE CONTENT! -->
