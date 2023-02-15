@@ -62,14 +62,14 @@ const router = createRouter({
 router.beforeEach((to) => {
   let isUser = false;
   const user = Cookies.get("user");
-
+  
   if (user !== undefined) {
     isUser = JSON.parse(user).authState;
   }
 
-  // if (to.meta.requiresAuth && !isUser) {
-  //   router.push({ name: "login" });
-  // }
+  if (to.meta.requiresAuth && !isUser) {
+    router.push({ name: "login" });
+  }
   window.document.title = to.meta.title;
 });
 
