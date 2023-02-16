@@ -14,10 +14,10 @@ function createHttpBody(_authToken: any) {
   };
 }
 
-const devicesData = ref([]);
+const devicesData = ref([] as any[]);
 let authToken: any;
 let deviceList: any;
-let fetchDevicesInterval: number;
+let fetchDevicesInterval: NodeJS.Timer;
 
 async function fetchDevices() {
   authToken = Cookies.get("token");
@@ -35,8 +35,8 @@ async function fetchDevices() {
 }
 
 function toggleElementInfo(tempId: Number) {
-  const element = document.querySelector(`.device-${tempId}-info-content`);
-  element.classList.toggle("w3-hide");
+  const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
+  dev.classList.toggle("w3-hide");
 }
 
 onMounted(() => {

@@ -17,7 +17,6 @@ export const HTTP: AxiosInstance = axios.create({
     "Content-Type": "application/json"
   }
 })
-// console.log(process.env.NODE_ENV);
 
 /*
 http://192.168.0.100:8282/iotpp/rest/user_service
