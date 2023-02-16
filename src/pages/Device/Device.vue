@@ -84,38 +84,38 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <div class="container relative p-4">
-    <div v-if="!devicesData" class="device-content absolute left-24">
+  <div class="container relative p-4 pl-24">
+    <div v-if="!devicesData" class="device-content p-4">
       <h3>Notice:</h3>
       <p>Devices, should be automatically displayed here. If you read this there should be an error or no connection to the server.</p>
     </div>
-    <div v-else class="device-content absolute left-24">
-      <ul>
-        <li v-for="(device, index) in devicesData" :key="index" class="device-element">
-          <div style="height: 3em; padding: 0.6em">
+    <div v-else class="device-content p-4 grid grid-cols-3 grid-rows-2 grid-flow-col gap-4">
+      <ul class="flex flex-auto flex-row gap-8 row=span-2">
+        <li v-for="(device, index) in devicesData" :key="index" class="device-element container">
+          <div class="w-72 h-64">
             <router-link
               :to="{
                 name: 'device',
                 params: { id: device.deviceId },
               }">
-              <!--STATUS ICON-->
-              <div class="fa fa-desktop device-status-icon" aria-hidden="true"></div>
+              <div v-if="device.deviceImage === ''">
+                <img :id="'device-img-' + device.deviceId" src="http://" alt=" No image found" class="w-72 object-cover rounded-t-3xl opacity-80" />
+              </div>
+              <div v-else class=" ">
+                <img :id="'device-img-' + device.deviceId" :src="device.deviceImage" class="w-72 object-cover rounded-t-3xl opacity-80" :alt="device.deviceName" />
+              </div>
+
               <!--DEVICE NAME-->
-              <div class="device-name">
+              <div class="device-description p-4 overflow-ellipsis bg-zinc-700 rounded-b-2xl">
                 {{ device.deviceName }}
               </div>
             </router-link>
             <!--TOGGLE INFO-->
-            <div class="fa fa-chevron-down device-toggle-info" aria-hidden="true" @click="toggleElementInfo(device.deviceId)"></div>
+            <div class="fa fa-chevron-down device-toggle-info hidden" aria-hidden="true" @click="toggleElementInfo(device.deviceId)"></div>
           </div>
+
           <!--INFO CONTENT-->
-          <div :class="'device-' + device.deviceId + '-info-content device-info-style w3-hide'">
-            <div v-if="device.deviceImage === ''">
-              <img :id="'device-img-' + device.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
-            </div>
-            <div v-else class="">
-              <img :id="'device-img-' + device.deviceId" :src="device.deviceImage" class="w3-show w3-image" :alt="device.deviceName" />
-            </div>
+          <div :class="'device-' + device.deviceId + '-info-content hidden'">
             <div :id="'show-info-' + device.deviceId" class="device-info">
               <ul>
                 <li>ID: {{ device.deviceId }}</li>
@@ -128,10 +128,7 @@ onUnmounted(() => {
           </div>
         </li>
       </ul>
-    </div>
-
-    <div class="info-content">
-      <div class="element-body" style="padding: 0">
+      <div class="i-map col-start-3 col-span-1 row-span-1">
         <interactive-map></interactive-map>
       </div>
     </div>
