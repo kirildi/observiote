@@ -67,7 +67,6 @@ async function login() {
       username: data.username,
       authState: isAuthenticated,
     };
-    console.log(user);
 
     if (userCookie === undefined) {
       Cookies.set("user", JSON.stringify(user), {

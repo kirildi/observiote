@@ -5,8 +5,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   server: {
     proxy: {
-      "/iotpp/rest/auth_service": "http://localhost:8285"
-
+      "/iotpp/rest/": "http://localhost:8285"
     }
   },
   plugins: [vue()],

@@ -30,7 +30,7 @@ import Cookies from "js-cookie";
 import { onMounted, watchEffect, ref, inject } from "vue";
 // import { useRoute } from "vue-router"
 
-const emitter = inject("emitter");
+const emitter: any = inject("emitter");
 const title = ref("");
 const route = null;
 // const route = useRoute()
@@ -51,12 +51,16 @@ function emitInfoButton() {
   emitter.emit("infoButton", true);
 }
 
+function logout(): any {
+  emitter.emit("logout", true);
+}
+
 watchEffect(() => {
   const userCookie = Cookies.get("user");
   if (userCookie !== undefined) user = JSON.parse(userCookie);
   // title.value = route.meta.title;
 
-  emitter.on("updateInfoButton", (e) => {
+  emitter.on("updateInfoButton", (e: any) => {
     isInfoButtonShown.value = e;
   });
 });
