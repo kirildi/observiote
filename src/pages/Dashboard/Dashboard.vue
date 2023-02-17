@@ -39,7 +39,7 @@ function logout() {
     <tab-nav />
     <side-bar />
     <!-- CONTENT -->
-    <div class="view-content">
+    <div class="view-content pl-24">
       <!-- <global-error /> -->
       <router-view />
     </div>
