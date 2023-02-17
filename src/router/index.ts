@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecord, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory,  RouteRecordRaw } from "vue-router";
 import Cookies from "js-cookie";
 
 const routes:Array<RouteRecordRaw> = [
@@ -70,7 +70,7 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !isUser) {
     router.push({ name: "login" });
   }
-  window.document.title = to.meta.title;
+  window.document.title = to.meta.title
 });
 
 export default router;

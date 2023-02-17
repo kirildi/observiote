@@ -84,7 +84,7 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <div class="container relative p-4 pl-24">
+  <div class="container relative p-4">
     <div v-if="!devicesData" class="device-content p-4">
       <h3>Notice:</h3>
       <p>Devices, should be automatically displayed here. If you read this there should be an error or no connection to the server.</p>
@@ -128,8 +128,8 @@ onUnmounted(() => {
           </div>
         </li>
       </ul>
-      <div class="i-map col-start-3 col-span-1 row-span-1">
-        <interactive-map></interactive-map>
+      <div class="map__area col-start-3 col-span-1 row-span-1">
+        <interactive-map />
       </div>
     </div>
   </div>
