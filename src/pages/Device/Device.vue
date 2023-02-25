@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watchEffect } from "vue";
 import InteractiveMap from "../../components/interactive/InteractiveMap.vue";
-
 import Cookies from "js-cookie";
 
 import { HTTP } from "../../components/httpObject";
-// import InteractiveMap from "../components/interactive/InteractiveMap.vue";
+
+interface PropsId {
+  id: number;
+}
 
 function createHttpBody(_authToken: any) {
   return {
@@ -15,12 +17,12 @@ function createHttpBody(_authToken: any) {
 }
 
 const devicesData = ref([] as any[]);
-let authToken: any;
-let deviceList: any;
+let authToken: string;
+let deviceList: string;
 let fetchDevicesInterval: NodeJS.Timer;
 
 async function fetchDevices() {
-  authToken = Cookies.get("token");
+  authToken = Cookies.get("token") as string;
   const requestBody = createHttpBody(authToken);
 
   const deviceRequest = await HTTP.post("/iotpp/rest/device_service", requestBody, {
@@ -42,13 +44,15 @@ function toggleElementInfo(tempId: Number) {
 onMounted(() => {
   if (deviceList) {
     devicesData.value = JSON.parse(deviceList);
+    console.log("devData", devicesData.value);
   } else {
     const res = fetchDevices();
 
     res
       .then(() => {
-        deviceList = sessionStorage.getItem("deviceList");
+        deviceList = sessionStorage.getItem("deviceList") as string;
         devicesData.value = JSON.parse(deviceList);
+
         //   store.dispatch("alertStore/removeError");
       })
       .catch((e) => {
@@ -66,7 +70,7 @@ watchEffect(() => {
     const res = fetchDevices();
     res
       .then(() => {
-        deviceList = sessionStorage.getItem("deviceList");
+        deviceList = sessionStorage.getItem("deviceList") as string;
         devicesData.value = JSON.parse(deviceList);
         //   store.dispatch("alertStore/removeError");
       })
@@ -106,7 +110,7 @@ onUnmounted(() => {
               </div>
 
               <!--DEVICE NAME-->
-              <div class="device-description p-4 overflow-ellipsis bg-zinc-700 rounded-b-2xl">
+              <div class="device-description p-4 overflow-ellipsis bg-zinc-700 rounded-b-xl">
                 {{ device.deviceName }}
               </div>
             </router-link>

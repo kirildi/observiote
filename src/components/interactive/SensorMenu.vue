@@ -1,23 +1,24 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import ButtonControl from "./ButtonControl.vue";
+import Slider from "./Slider.vue";
+
+const props = defineProps<{
+  sensorId: number;
+  //devId: number;
+  sensorType: any;
+}>();
+
+const isSensorMenuVisible = ref(false);
+const isPropertiesMenuVisible = ref(false);
+</script>
 <template>
-  <button
-    class="fa fa-cog settings-button"
-    @click="isSensorMenuVisible = true"
-  ></button>
+  <button class="fa fa-cog settings-button" @click="isSensorMenuVisible = true"></button>
   <div v-show="isSensorMenuVisible" :id="sensorId" class="sensor-menu-wrapper">
     <div class="chart-main">
       <div class="sensor-menu-header">
-        <button
-          class="fa fa-close close-settings w3-left"
-          style="
-            padding: 0.5rem;
-            background-color: #303030;
-            border-radius: 0.6rem;
-          "
-          @click="isSensorMenuVisible = false"
-        ></button>
-        <span class="w3-center"
-          >Settings - {{ sensorType.sensorTypeName }}</span
-        >
+        <button class="fa fa-close close-settings" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isSensorMenuVisible = false"></button>
+        <span class="w3-center">Settings - {{ sensorType.sensorTypeName }}</span>
       </div>
 
       <div class="sensor-menu-body">
@@ -30,40 +31,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import { ref } from "vue"
-import ButtonControl from "./ButtonControl.vue"
-import Slider from "./Slider.vue"
-
-export default {
-  name: "SensorMenu",
-  components: { ButtonControl, Slider },
-  props: {
-    sensorId: {
-      type: Number,
-      default: 0
-    },
-    devId: {
-      type: Number,
-      default: 0
-    },
-    sensorType: {
-      type: Object,
-      default: () => {}
-    }
-  },
-  setup() {
-    const isSensorMenuVisible = ref(false)
-    const isPropertiesMenuVisible = ref(false)
-
-    return {
-      isSensorMenuVisible,
-      isPropertiesMenuVisible
-    }
-  }
-}
-</script>
 
 <style scoped>
 .sensor-menu-wrapper {

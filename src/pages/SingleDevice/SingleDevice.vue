@@ -7,13 +7,11 @@ import InteractiveMap from "../../components/interactive/InteractiveMap.vue";
 import SensorMenu from "../../components/interactive/SensorMenu.vue";
 import ButtonControl from "../../components/interactive/ButtonControl.vue";
 import SensorHistoryChart from "../../components/interactive/SensorHistoryChart.vue";
-// import Sensor from "../../components/Sensor.vue";
+import Sensor from "../../components/Sensor.vue";
 
-interface Props {
+const props = defineProps<{
   id: number;
-}
-
-const props = defineProps<Props>();
+}>();
 
 function createHttpBody(devId: any) {
   return {
@@ -21,16 +19,13 @@ function createHttpBody(devId: any) {
     deviceId: devId,
   };
 }
-//   props: {
-//     id: {
-//       type: Number,
 
-const emitter: any = inject("emitter");
+const emitter = inject<string>("emitter");
 
 const isInfoShown = ref(false);
 
-const deviceList = ref({} as any);
-const deviceContent = ref({} as any);
+const deviceList = ref([] as Array<any>);
+const deviceContent = ref([] as any[]);
 const dataForInfo = ref({} as any);
 const sensorData = ref({} as any);
 const actuatorContent = ref({} as any);
@@ -80,7 +75,8 @@ onBeforeMount(() => {
   deviceList.value = JSON.parse(sessionStorage.getItem("deviceList") as string);
 
   for (let index = 0; index < deviceList.value.length; index += 1) {
-    if (deviceList.value[index].deviceId === props.id.toString()) {
+    console.log(typeof deviceList.value[index].deviceId, typeof props.id, "props id", props.id);
+    if (deviceList.value[index].deviceId === props.id) {
       dataForInfo.value = deviceList.value[index];
       break;
     }
@@ -89,6 +85,7 @@ onBeforeMount(() => {
 onMounted(() => {
   authToken = Cookies.get("token");
   emitter.emit("updateInfoButton", true);
+
   window.document.title = dataForInfo.value.deviceName; // Updates page title
 
   document.querySelectorAll(".tabs")[0].innerHTML = dataForInfo.value.deviceName; // Updates content header title
@@ -151,9 +148,9 @@ onUnmounted(() => {
 </script>
 <template>
   <!-- DEVICE INFO -->
-  <div v-show="isInfoShown" class="info-container">
-    <button class="fa fa-close info-close w3-left" @click="isInfoShown = false">Close</button>
-    <div class="info-content">
+  <div v-show="isInfoShown" class="info__container">
+    <button class="fa fa-close info__close" @click="isInfoShown = false">Close</button>
+    <div class="info__content">
       <div v-if="dataForInfo.deviceImage === ''">
         <img :id="'device-img-' + dataForInfo.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
       </div>
@@ -173,31 +170,31 @@ onUnmounted(() => {
   </div>
 
   <!-- SENSORS -->
-  <div class="single__device container relative p-4">
-    <div class="grid grid-cols-3 grid-rows-2 grid-flow-col gap-8">
+  <div class="single__device container relative p-8">
+    <div class="grid grid-cols-3 grid-rows-2 grid-flow-col gap-8 h-full">
       <div v-if="!deviceContent || deviceContent.length === 0" class="p-4">
         <p>Device does't have sensors at this moment.</p>
         <p>NOTICE: Device content is updated automaticaly.</p>
       </div>
-      <div v-else class="sensors__area flex flex-auto flex-row gap-8 row=span-3">
-        <div class="sensor-container">
-          <div v-for="sensor in deviceContent" :key="sensor.sensorId" class="sensor-content">
-            <div class="sensor-header">
-              <span class="w3-left w3-col s10 l9">
-                {{ sensor.sensorTypeId.sensorTypeName }}
+      <div v-else class="sensors__area row-span-2 col-span-2 col-start-1 flex flex-row flex-wrap gap-8 basis-60">
+        <div v-for="sensor in deviceContent" :key="sensor.sensorId" class="sensor__cell p-4 bg-zinc-700 rounded-xl">
+          <div class="sensor__header w-60 h-8 flex flex-row flex-auto place-content-between">
+            <span class=" ">
+              {{ sensor.sensorTypeId.sensorTypeName }}
+            </span>
+            <div class="">
+              <span class="pl-4">
+                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="sensor.sensorId" :dev-id="id" />
               </span>
-              <span class="w3-col s1 l2">
-                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="sensor.sensorId" :dev-id="parseInt(id, 10)" />
-              </span>
-              <span class="w3-right w3-col s1 l1" style="font-size: 1.2em; text-align: center">
-                <sensor-menu :sensor-id="sensor.sensorId" :dev-id="parseInt(id, 10)" :sensor-type="sensor.sensorTypeId" />
+              <span class="pl-4">
+                <sensor-menu :sensor-id="parseInt(sensor.sensorId, 10)" :sensor-type="sensor.sensorTypeId" />
               </span>
             </div>
+          </div>
 
-            <div class="sensor-body">
-              <!-- SENSOR -->
-              <!-- <sensor :id="'sensor_' + sensor.sensorId" :content="sensor" :data="sensorData" /> -->
-            </div>
+          <div class="sensor__body w-60 h-32">
+            <!-- SENSOR -->
+            <sensor :id="'sensor_' + sensor.sensorId" :content="sensor" :data="sensorData" />
           </div>
         </div>
       </div>
@@ -211,9 +208,9 @@ onUnmounted(() => {
       <div v-if="!actuatorContent || actuatorContent.length === 0" class="controllers__area">
         <p>Device does't have actuators at this moment.</p>
       </div>
-      <div v-else class="controllers__area">
+      <div v-else class="controllers__area col-start-3 col-span-1 row-span-1">
         <div class="actuators-content">
-          <button-control name="button" />
+          <button-control :id="props.id" name="button" />
           <!-- <slider name="slider" /> -->
         </div>
       </div>
