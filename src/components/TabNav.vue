@@ -11,7 +11,7 @@
     </div>
 
     <div class="w-10/12 h-16 p-4 decoration-zinc-50 text-xl">
-      <span class="">{{ title }}</span>
+      <span class="tabs">{{ title }}</span>
     </div>
     <button v-if="isInfoButtonShown" class="w-16 h-16 p-4 decoration-zinc-50 text-xl" value="Info" @click="emitInfoButton()">
       <em class="fa fa-info-circle"></em>

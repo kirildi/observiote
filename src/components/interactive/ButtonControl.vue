@@ -1,52 +1,28 @@
+<script setup lang="ts">
+import { ref, watchEffect } from "vue";
+
+const props = defineProps<{ id: number; name: string }>();
+
+const isOn = ref(false);
+const buttonValue = ref("Off");
+
+watchEffect(() => {
+  if (!isOn.value) {
+    buttonValue.value = "Off";
+  } else {
+    buttonValue.value = "On";
+  }
+});
+</script>
 <template>
   <div class="button-controller">
     <!-- Rounded switch -->
     <label class="switch">
-      <input
-        :name="name"
-        :value="buttonValue"
-        class="w3-left"
-        type="checkbox"
-        @click="isOn = !isOn"
-      />
+      <input :name="props.name" :value="buttonValue" class="w3-left" type="checkbox" @click="isOn = !isOn" />
       <span class="slider round"></span>
     </label>
   </div>
 </template>
-
-<script>
-import { ref, watchEffect } from "vue"
-
-export default {
-  name: "ButtonControl",
-  props: {
-    id: {
-      type: Number,
-      default: 0
-    },
-    name: {
-      type: String,
-      default: ""
-    }
-  },
-  setup() {
-    const isOn = ref(false)
-    const buttonValue = ref("Off")
-
-    watchEffect(() => {
-      if (!isOn.value) {
-        buttonValue.value = "Off"
-      } else {
-        buttonValue.value = "On"
-      }
-    })
-    return {
-      isOn,
-      buttonValue
-    }
-  }
-}
-</script>
 
 <style scoped>
 .button-controller {
