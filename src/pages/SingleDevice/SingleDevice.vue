@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, onBeforeMount, ref, watchEffect, inject } from "vue";
+import { onMounted, onUnmounted, onBeforeMount, ref, watchEffect, inject, PropType } from "vue";
 
 import Cookies from "js-cookie";
 import { HTTP } from "../../components/httpObject";
@@ -10,7 +10,7 @@ import SensorHistoryChart from "../../components/interactive/SensorHistoryChart.
 import Sensor from "../../components/Sensor.vue";
 
 const props = defineProps<{
-  id: number;
+  id: number | string;
 }>();
 
 function createHttpBody(devId: any) {
@@ -24,9 +24,9 @@ const emitter = inject<string>("emitter");
 
 const isInfoShown = ref(false);
 
-const deviceList = ref([] as Array<any>);
+const devicesList = ref([] as Array<any>);
 const deviceContent = ref([] as any[]);
-const dataForInfo = ref({} as any);
+const dataForInfoBox = ref({} as any);
 const sensorData = ref({} as any);
 const actuatorContent = ref({} as any);
 
@@ -72,12 +72,13 @@ async function updateSensors(devId: any) {
 
 onBeforeMount(() => {
   // Fetching the device list from session, used for info box.
-  deviceList.value = JSON.parse(sessionStorage.getItem("deviceList") as string);
+  devicesList.value = JSON.parse(sessionStorage.getItem("deviceList") as string);
 
-  for (let index = 0; index < deviceList.value.length; index += 1) {
-    console.log(typeof deviceList.value[index].deviceId, typeof props.id, "props id", props.id);
-    if (deviceList.value[index].deviceId === props.id) {
-      dataForInfo.value = deviceList.value[index];
+  for (let index of devicesList.value) {
+    if (String(index.deviceId) === props.id) {
+      dataForInfoBox.value = index;
+      console.log("info data logged");
+
       break;
     }
   }
@@ -86,9 +87,9 @@ onMounted(() => {
   authToken = Cookies.get("token");
   emitter.emit("updateInfoButton", true);
 
-  window.document.title = dataForInfo.value.deviceName; // Updates page title
+  window.document.title = dataForInfoBox.value.deviceName; // Updates page title
 
-  document.querySelectorAll(".tabs")[0].innerHTML = dataForInfo.value.deviceName; // Updates content header title
+  document.querySelectorAll(".tabs")[0].innerHTML = dataForInfoBox.value.deviceName; // Updates content header title
 
   if (sensorList) {
     deviceContent.value = JSON.parse(sensorList);
@@ -151,21 +152,21 @@ onUnmounted(() => {
   <div v-show="isInfoShown" class="info__container">
     <button class="fa fa-close info__close" @click="isInfoShown = false">Close</button>
     <div class="info__content">
-      <div v-if="dataForInfo.deviceImage === ''">
-        <img :id="'device-img-' + dataForInfo.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
+      <div v-if="dataForInfoBox.deviceImage === ''">
+        <img :id="'device-img-' + dataForInfoBox.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
       </div>
       <div v-else>
-        <img :id="'device-img-' + dataForInfo.deviceId" :src="dataForInfo.deviceImage" class="w3-show w3-image" :alt="dataForInfo.deviceName" />
+        <img :id="'device-img-' + dataForInfoBox.deviceId" :src="dataForInfoBox.deviceImage" class="w3-show w3-image" :alt="dataForInfoBox.deviceName" />
       </div>
-      <div :id="'show-info-' + dataForInfo.deviceId">
+      <div :id="'show-info-' + dataForInfoBox.deviceId">
         <ul>
-          <li>ID: {{ dataForInfo.deviceId }}</li>
-          <li>Date created: {{ dataForInfo.deviceCreateDate }}</li>
-          <li>Date modified:{{ dataForInfo.deviceLastModifyDate }}</li>
-          <li>Coordinates: {{ dataForInfo.deviceCoordinates }}</li>
+          <li>ID: {{ dataForInfoBox.deviceId }}</li>
+          <li>Date created: {{ dataForInfoBox.deviceCreateDate }}</li>
+          <li>Date modified:{{ dataForInfoBox.deviceLastModifyDate }}</li>
+          <li>Coordinates: {{ dataForInfoBox.deviceCoordinates }}</li>
         </ul>
       </div>
-      <div class="w3-small text-wrap">Description: {{ dataForInfo.deviceDescription }}</div>
+      <div class="w3-small text-wrap">Description: {{ dataForInfoBox.deviceDescription }}</div>
     </div>
   </div>
 
@@ -187,7 +188,7 @@ onUnmounted(() => {
                 <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="sensor.sensorId" :dev-id="id" />
               </span>
               <span class="pl-4">
-                <sensor-menu :sensor-id="parseInt(sensor.sensorId, 10)" :sensor-type="sensor.sensorTypeId" />
+                <sensor-menu :sensor-id="sensor.sensorId" :sensor-type="sensor.sensorTypeId" />
               </span>
             </div>
           </div>

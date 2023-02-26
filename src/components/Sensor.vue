@@ -14,12 +14,6 @@ const props = defineProps<{
   content?: any;
   data?: any;
 }>();
-
-// const props = defineProps <{
-//   id: number;
-//   content: [] as any[];
-//   data: [] as any[];
-// }>();
 </script>
 
 <template>
