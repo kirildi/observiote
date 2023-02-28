@@ -27,7 +27,7 @@ const isInfoShown = ref(false);
 const devicesList = ref([] as Array<any>);
 const deviceContent = ref([] as any[]);
 const dataForInfoBox = ref({} as any);
-const sensorData = ref({} as any);
+const sensorData = ref([] as any[]);
 const actuatorContent = ref({} as any);
 
 let authToken: string | undefined = "";
@@ -77,8 +77,6 @@ onBeforeMount(() => {
   for (let index of devicesList.value) {
     if (String(index.deviceId) === props.id) {
       dataForInfoBox.value = index;
-      console.log("info data logged");
-
       break;
     }
   }

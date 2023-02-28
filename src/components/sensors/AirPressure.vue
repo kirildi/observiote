@@ -1,6 +1,49 @@
+<script setup lang="ts">
+import { onMounted, ref, watchEffect } from "vue";
+import DefaultSensor from "./DefaultSensor.vue";
+
+const props = defineProps<{
+  id: number;
+  type: string;
+  data: any[];
+}>();
+const isType = ref("basic");
+const dataNow = ref("");
+let gaugeFill: HTMLElement | null = null;
+
+function updateGauge(fill: HTMLElement | null) {
+  if (!fill) return;
+  const converted = parseInt(dataNow.value, 10);
+  const value = converted / 20;
+  fill.style.transform = `rotate(${value}turn)`;
+}
+
+onMounted(() => {
+  isType.value = props.type;
+  for (let i = 0; i < props.data.length; i += 1) {
+    if (props.data[i].sensorId === props.id) {
+      dataNow.value = props.data[i].sensorData;
+      break;
+    }
+  }
+  gaugeFill = document.querySelector<HTMLElement>(".pressure-gauge-fill");
+  updateGauge(gaugeFill);
+});
+watchEffect(() => {
+  gaugeFill = document.querySelector<HTMLElement>(".pressure-gauge-fill");
+  updateGauge(gaugeFill);
+
+  for (let i = 0; i < props.data.length; i += 1) {
+    if (props.data[i].sensorId === props.id) {
+      dataNow.value = props.data[i].sensorData;
+      break;
+    }
+  }
+});
+</script>
 <template>
   <div v-if="isType === 'basic'" class="air-pressure-container">
-    <default-sensor :id="'basic_' + id" :basic-data="dataNow" />
+    <default-sensor :id="'basic_' + id" :default-data="dataNow" />
   </div>
   <div v-else class="air-pressure-container">
     <div class="pressure-gauge-body">
@@ -11,74 +54,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import { onMounted, ref, watchEffect } from "vue"
-import DefaultSensor from "./DefaultSensor.vue"
-
-/* eslint-disable no-param-reassign */
-export default {
-  name: "AirPressure",
-  components: { DefaultSensor },
-  props: {
-    id: {
-      type: Number,
-      default: 0
-    },
-    type: {
-      type: String,
-      default: "basic"
-    },
-    data: {
-      type: Array,
-      default: () => []
-    }
-  },
-  setup(props) {
-    const isType = ref("basic")
-    const dataNow = ref("")
-    let gaugeFill = null
-
-    function updateGauge(fill) {
-      if (!fill) return
-      const converted = parseInt(dataNow.value, 10)
-      const value = converted / 20
-      fill.style.transform = `rotate(${value}turn)`
-    }
-
-    onMounted(() => {
-      isType.value = props.type
-      for (let i = 0; i < props.data; i += 1) {
-        if (props.data[i].sensorId === props.id) {
-          dataNow.value = props.data[i].sensorData
-          break
-        }
-      }
-      gaugeFill = document.querySelector(".pressure-gauge-fill")
-      updateGauge(gaugeFill)
-    })
-    watchEffect(() => {
-      gaugeFill = document.querySelector(".pressure-gauge-fill")
-      updateGauge(gaugeFill)
-
-      for (let i = 0; i < props.data.length; i += 1) {
-        if (props.data[i].sensorId === props.id) {
-          dataNow.value = props.data[i].sensorData
-          break
-        }
-      }
-    })
-
-    return {
-      isType,
-      dataNow,
-      gaugeFill,
-      updateGauge
-    }
-  }
-}
-</script>
-
 <style scoped>
 .air-pressure-container {
   width: 100%;

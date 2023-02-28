@@ -4,7 +4,7 @@ import ButtonControl from "./ButtonControl.vue";
 import Slider from "./Slider.vue";
 
 const props = defineProps<{
-  sensorId: number;
+  sensorId?: string | number;
   //devId: number;
   sensorType: any;
 }>();
@@ -14,7 +14,7 @@ const isPropertiesMenuVisible = ref(false);
 </script>
 <template>
   <button class="fa fa-cog settings-button" @click="isSensorMenuVisible = true"></button>
-  <div v-show="isSensorMenuVisible" :id="sensorId" class="sensor-menu-wrapper">
+  <div v-show="isSensorMenuVisible" :id="sensorId as string" class="sensor-menu-wrapper">
     <div class="chart-main">
       <div class="sensor-menu-header">
         <button class="fa fa-close close-settings" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isSensorMenuVisible = false"></button>
