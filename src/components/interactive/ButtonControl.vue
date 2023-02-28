@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 
-const props = defineProps<{ id: number; name: string }>();
+const props = defineProps<{ id?: string; name: string }>();
 
 const isOn = ref(false);
 const buttonValue = ref("Off");
@@ -18,7 +18,7 @@ watchEffect(() => {
   <div class="button-controller">
     <!-- Rounded switch -->
     <label class="switch">
-      <input :name="props.name" :value="buttonValue" class="w3-left" type="checkbox" @click="isOn = !isOn" />
+      <input :id="props.id" :name="props.name" :value="buttonValue" class="w3-left" type="checkbox" @click="isOn = !isOn" />
       <span class="slider round"></span>
     </label>
   </div>

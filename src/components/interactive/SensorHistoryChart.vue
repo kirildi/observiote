@@ -51,7 +51,7 @@ const props = defineProps<{
   chartId: string;
   labelName: string;
   sensorId?: number;
-  devId: number;
+  devId: number | string;
 }>();
 const isSensorChartVisible = ref(false);
 const isPropertiesMenuVisible = ref(false);

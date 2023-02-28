@@ -12,7 +12,7 @@ import WaterLevel from "./sensors/WaterLevel.vue";
 const props = defineProps<{
   id: string;
   content?: any;
-  data?: any;
+  data: any[];
 }>();
 </script>
 
