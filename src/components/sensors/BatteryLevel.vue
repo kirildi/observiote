@@ -12,16 +12,16 @@ const dataNow = ref("");
 
 onMounted(() => {
   isType.value = props.type;
-  for (let index of props.data) {
-    if (index.sensorId === props.id) {
-      dataNow.value = index.sensorData;
+  for (let i = 0; i < props.data.length; i += 1) {
+    if (props.data[i].sensorId.sensorId === props.id) {
+      dataNow.value = props.data[i].sensorData;
       break;
     }
   }
 });
 watchEffect(() => {
   for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId === props.id) {
+    if (props.data[i].sensorId.sensorId === props.id) {
       dataNow.value = props.data[i].sensorData;
       break;
     }
