@@ -14,7 +14,7 @@ const degree = ref("\u{00B0}C");
 onMounted(() => {
   isType.value = props.type;
   for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId === props.id) {
+    if (props.data[i].sensorId.sensorId === props.id) {
       dataNow.value = props.data[i].sensorData;
       break;
     }
@@ -22,7 +22,7 @@ onMounted(() => {
 });
 watchEffect(() => {
   for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId === props.id) {
+    if (props.data[i].sensorId.sensorId === props.id) {
       dataNow.value = props.data[i].sensorData;
       break;
     }

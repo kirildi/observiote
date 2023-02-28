@@ -22,11 +22,11 @@ function createHttpBody(devId: any) {
 
 const emitter = inject<string>("emitter");
 
-const isInfoShown = ref(false);
+const isInfoBoxShown = ref(false);
+const dataForInfoBox = ref({} as any);
 
 const devicesList = ref([] as Array<any>);
 const deviceContent = ref([] as any[]);
-const dataForInfoBox = ref({} as any);
 const sensorData = ref([] as any[]);
 const actuatorContent = ref({} as any);
 
@@ -51,20 +51,18 @@ async function updateSensors(devId: any) {
   const body = {
     deviceId: devId,
   };
-  const sensorGetData = HTTP.post("/iotpp/rest/sensor_service/sensor_value", body, {
+  const sensorGetData = await HTTP.post("/iotpp/rest/sensor_service/sensor_value", body, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authToken}`,
     },
-  });
-  // clears array for the new data
-  sensorGetData.then((response) => {
-    const respData = response.data;
-    sensorData.value = [];
+  }).then((response) => {
+    sensorData.value = []; // TODO better way for clearing array here
+
     for (let i = 0; i < deviceContent.value.length; i += 1) {
       sensorData.value.push({
-        sensorId: respData[i].sensorId,
-        sensorData: respData[i].constructedDataPacketValue,
+        sensorId: response.data[i].sensorId,
+        sensorData: response.data[i].constructedDataPacketValue,
       });
     }
   });
@@ -89,14 +87,13 @@ onMounted(() => {
 
   document.querySelectorAll(".tabs")[0].innerHTML = dataForInfoBox.value.deviceName; // Updates content header title
 
-  if (sensorList) {
-    deviceContent.value = JSON.parse(sensorList);
-  } else {
+  if (!sensorList) {
     const fetchResult = fetchSensors(props.id);
     fetchResult
       .then(() => {
         sensorList = sessionStorage.getItem("sensorList");
         deviceContent.value = JSON.parse(sensorList);
+        updateSensors(props.id);
         //   store.dispatch("alertStore/removeError"); // Removes error on success, if any.
       })
       .catch((e) => {
@@ -106,13 +103,15 @@ onMounted(() => {
         //     message: e.response.statusText,
         //   });
       });
+  } else {
+    deviceContent.value = JSON.parse(sensorList);
+    updateSensors(props.id);
   }
-  updateSensors(props.id);
 });
 
 watchEffect(() => {
-  emitter.on("infoButton", (e: any) => {
-    isInfoShown.value = e;
+  emitter.on("infoButton", (e: boolean) => {
+    isInfoBoxShown.value = e;
   });
 
   const requestTime = 19000;
@@ -147,8 +146,8 @@ onUnmounted(() => {
 </script>
 <template>
   <!-- DEVICE INFO -->
-  <div v-show="isInfoShown" class="info__container">
-    <button class="fa fa-close info__close" @click="isInfoShown = false">Close</button>
+  <div v-show="isInfoBoxShown" class="info__container">
+    <button class="fa fa-close info__close" @click="isInfoBoxShown = false">Close</button>
     <div class="info__content">
       <div v-if="dataForInfoBox.deviceImage === ''">
         <img :id="'device-img-' + dataForInfoBox.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
