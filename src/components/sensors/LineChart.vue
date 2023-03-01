@@ -1,45 +1,38 @@
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { Chart, registerables } from "chart.js";
+import planetChartData from "./chart-data";
+
+Chart.register(...registerables);
+
+const props = defineProps<{
+  id: string;
+}>();
+
+let ctx: CanvasRenderingContext2D | null = null;
+
+function createChart(chartData: any) {
+  if (ctx) {
+    const myChart = new Chart(ctx, {
+      type: chartData.type,
+      data: chartData.data,
+      options: chartData.options,
+    });
+
+    return myChart;
+  }
+}
+onMounted(() => {
+  ctx = null;
+  ctx = document.getElementById(props.id).getContext("2d");
+  if (ctx !== null) {
+    createChart(planetChartData);
+  }
+});
+</script>
 <template>
   <canvas :id="id" class="chart-item"></canvas>
 </template>
-
-<script>
-import { onMounted } from "vue"
-import { Chart, registerables } from "chart.js"
-import planetChartData from "./chart-data"
-
-Chart.register(...registerables)
-
-export default {
-  props: {
-    id: {
-      type: String,
-      default: ""
-    }
-  },
-  setup(props) {
-    let ctx = null
-
-    function createChart(chartData) {
-      const myChart = new Chart(ctx, {
-        type: chartData.type,
-        data: chartData.data,
-        options: chartData.options
-      })
-
-      return myChart
-    }
-    onMounted(() => {
-      ctx = {}
-      ctx = document.getElementById(props.id).getContext("2d")
-      if (ctx !== null) {
-        createChart(planetChartData)
-      }
-    })
-
-    return { ctx, createChart }
-  }
-}
-</script>
 
 <style scoped>
 .chart-item {
