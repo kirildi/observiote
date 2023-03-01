@@ -1,53 +1,22 @@
+<script setup lang="ts">
+import { ref } from "vue";
+
+const props = defineProps<{ id?: string; name: string }>();
+const isOn = ref(false);
+const rangeMin = ref(0);
+const rangeMax = ref(100);
+const label = ref("");
+</script>
 <template>
   <div class="slider-wrapper">
     <div class="w3-center">{{ rangeMax }}</div>
     <div>
-      <input
-        :id="id"
-        type="range"
-        :name="name"
-        :min="rangeMin"
-        :max="rangeMax"
-        step="1"
-        class="slider-controll w3-center"
-      />
+      <input :id="id" type="range" :name="name" :min="rangeMin" :max="rangeMax" step="1" class="slider-controll w3-center" />
     </div>
     <div class="w3-center">{{ rangeMin }}</div>
     <div class="w3-center">{{ name }}</div>
   </div>
 </template>
-
-<script>
-import { ref } from "vue"
-
-export default {
-  name: "SimpleSlider",
-  props: {
-    id: {
-      type: Number,
-      default: 0
-    },
-    name: {
-      type: String,
-      default: ""
-    }
-  },
-  setup() {
-    const isOn = ref(false)
-    const rangeMin = ref(0)
-    const rangeMax = ref(100)
-    const label = ref("")
-
-    return {
-      isOn,
-      rangeMin,
-      rangeMax,
-      label
-    }
-  }
-}
-</script>
-
 <style scoped>
 .slider-wrapper {
   width: 4em;

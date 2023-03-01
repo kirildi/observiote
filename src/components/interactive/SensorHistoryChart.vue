@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Chart, registerables } from "chart.js";
+import { Chart, ChartItem, registerables } from "chart.js";
 import "chartjs-adapter-luxon";
 import Cookies from "js-cookie";
 import { HTTP } from "../httpObject";
@@ -50,25 +50,29 @@ Chart.register(...registerables);
 const props = defineProps<{
   chartId: string;
   labelName: string;
-  sensorId?: number;
+  sensorId?: string;
   devId: number | string;
 }>();
 const isSensorChartVisible = ref(false);
 const isPropertiesMenuVisible = ref(false);
 
-let ctx: HTMLElement | null = null;
-let historyChartData = {};
-let newCt = {};
+let c: HTMLElement | null = null;
+let ctx: CanvasRenderingContext2D | null = null;
+
+let historyChartData: any = {};
+let newCt: any = {};
 const chartTextShowed = ref(true);
 const chartDataFiltered = ref([] as any[]);
 
-function createChart(chartData) {
-  const myChart = new Chart(ctx, {
-    type: chartData.type,
-    data: chartData.data,
-    options: chartData.options,
-  });
-  return myChart;
+function createChart(chartData: any) {
+  if (ctx) {
+    const myChart = new Chart(ctx, {
+      type: chartData.type,
+      data: chartData.data,
+      options: chartData.options,
+    });
+    return myChart;
+  }
 }
 /*
       Data object from emitter is formated like this, or check parrent file for more info:
@@ -86,7 +90,7 @@ function createHttpBody(timeMod: HTMLElement | null) {
     timeModifier: timeMod,
   };
 }
-async function fetchChartData(body) {
+async function fetchChartData(body: any) {
   const authToken = Cookies.get("token");
   const chartDataRequest = HTTP.post("/iotpp/rest/sensor_service/chart_value", body, {
     headers: {
@@ -193,12 +197,16 @@ onMounted(() => {
       },
     },
   };
-  ctx = null;
-  ctx = document.getElementById(props.chartId).getContext("2d");
 
+  c = document.getElementById(props.chartId);
+  if (c instanceof HTMLCanvasElement) {
+    ctx = c.getContext("2d");
+    if (ctx) {
+      historyChartData.data.datasets[0].label = props.labelName;
+      newCt = createChart(historyChartData);
+    }
+  }
   if (ctx !== null) {
-    historyChartData.data.datasets[0].label = props.labelName;
-    newCt = createChart(historyChartData);
   }
 });
 </script>

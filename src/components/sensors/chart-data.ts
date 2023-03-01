@@ -1,4 +1,4 @@
-const planetChartData = {
+const planetChartData: any = {
   type: "line",
   data: {
     labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -12,7 +12,7 @@ const planetChartData = {
         borderColor: ["#f4efde"],
         borderWidth: 1,
         pointRadius: 0,
-        tension: 0.1
+        tension: 0.1,
       },
       {
         // another line graph
@@ -23,9 +23,9 @@ const planetChartData = {
         borderColor: ["#f4efde"],
         borderWidth: 1,
         pointRadius: 0,
-        tension: 0.1
-      }
-    ]
+        tension: 0.1,
+      },
+    ],
   },
   options: {
     responsive: true,
@@ -38,12 +38,12 @@ const planetChartData = {
         display: true,
         beginAtZero: true,
         grid: {
-          display: false
+          display: false,
         },
         ticks: {
           display: true,
-          color: "#f4efde"
-        }
+          color: "#f4efde",
+        },
       },
       y: {
         type: "linear",
@@ -53,18 +53,18 @@ const planetChartData = {
         beginAtZero: true,
         grid: {
           display: true,
-          color: "#282828"
+          color: "#282828",
         },
         ticks: {
           display: true,
-          color: "#f4efde"
-        }
-      }
+          color: "#f4efde",
+        },
+      },
     },
     plugins: {
-      legend: { position: "top", align: "end", labels: { color: "#f4efde" } }
-    }
-  }
-}
+      legend: { position: "top", align: "end", labels: { color: "#f4efde" } },
+    },
+  },
+};
 
-export default planetChartData
+export default planetChartData;
