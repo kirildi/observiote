@@ -9,6 +9,7 @@ const props = defineProps<{
   id: string;
 }>();
 
+let c: HTMLElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
 
 function createChart(chartData: any) {
@@ -23,10 +24,12 @@ function createChart(chartData: any) {
   }
 }
 onMounted(() => {
-  ctx = null;
-  ctx = document.getElementById(props.id).getContext("2d");
-  if (ctx !== null) {
-    createChart(planetChartData);
+  c = document.getElementById(props.id);
+  if (c instanceof HTMLCanvasElement) {
+    ctx = c.getContext("2d");
+    if (ctx) {
+      createChart(planetChartData);
+    }
   }
 });
 </script>
