@@ -24,10 +24,6 @@ function emitInfoButton() {
   emitter.emit("infoButton", true);
 }
 
-function logout(): any {
-  emitter.emit("logout", true);
-}
-
 watchEffect(() => {
   const userCookie = Cookies.get("user");
   if (userCookie !== undefined) user = JSON.parse(userCookie);
@@ -59,16 +55,13 @@ onMounted(() => {
     <div class="w-10/12 h-16 p-4 decoration-zinc-50 text-xl">
       <span class="tabs">{{ title }}</span>
     </div>
-    <button v-if="isInfoButtonShown" class="w-16 h-16 p-4 decoration-zinc-50 text-xl" value="Info" @click="emitInfoButton()">
+    <button v-if="isInfoButtonShown" class="w-16 h-16 p-4 bg-zinc-600 decoration-zinc-50 text-xl" value="Info" @click="emitInfoButton()">
       <em class="fa fa-info-circle"></em>
     </button>
 
-    <div class="w-2/12 h-16 p-4 decoration-zinc-50 text-xl">
+    <div class="w-2/12 h-16 p-4 bg-zinc-700 decoration-zinc-50 text-xl overflow-hidden whitespace-nowrap text-ellipsis">
       <span class="">{{ user.username }}</span>
     </div>
-    <button class="w-16 h-16 bg-purple-600 text-xl" @click="logout">
-      <em class="fa fa-sign-out"></em>
-    </button>
   </header>
 </template>
 

@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+// import { useStore } from "vuex"
+import Cookies from "js-cookie";
+
+const router = useRouter();
+// const store = useStore()
+
+const store = null;
+function logout() {
+  // TODO may be could notify the server that user is logged out
+  // store.commit("loginStore/unSetAuthState");
+
+  Cookies.remove("user");
+  Cookies.remove("token");
+  router.replace({ name: "login" });
+}
+</script>
+
 <template>
   <!-- Sidebar/menu -->
   <div id="mySidebar" class="absolute top-1/4">
@@ -26,26 +45,11 @@
           <span class="hidden">Configuration</span>
         </li>
       </router-link>
+      <button class="w-16 h-16 mb-4 p-4 bg-purple-600 hover:bg-purple-800 rounded-r-xl" @click="logout">
+        <em class="fa fa-sign-out text-2xl"></em>
+      </button>
     </ul>
   </div>
 </template>
-
-<script setup lang="ts">
-// import { useRouter } from "vue-router"
-// import { useStore } from "vuex"
-import Cookies from "js-cookie";
-
-// const router = useRouter()
-// const store = useStore()
-const router = null;
-const store = null;
-
-function logout() {
-  // store.commit("loginStore/unSetAuthState");
-  // Cookies.remove("user");
-  // Cookies.remove("token");
-  // router.replace({ name: "login" });
-}
-</script>
 
 <style scoped></style>
