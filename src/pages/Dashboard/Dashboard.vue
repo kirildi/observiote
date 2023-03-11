@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { ref, watchEffect, inject } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import Cookies from "js-cookie";
+import { ref, watchEffect } from "vue";
+import { useRoute } from "vue-router";
 import SideBar from "../../components/SideBar.vue";
 import TabNav from "../../components/TabNav.vue";
 
 const isLoggedIn = ref(false);
-const emitter: any = inject("emitter");
-const router = useRouter();
 const route = useRoute();
 
 watchEffect(() => {
@@ -16,18 +13,7 @@ watchEffect(() => {
   } else {
     isLoggedIn.value = false;
   }
-
-  emitter.on("logout", () => {
-    logout();
-  });
 });
-
-function logout() {
-  // TODO may be should notify the server that user is logged out
-  Cookies.remove("user");
-  Cookies.remove("token");
-  router.replace({ name: "login" });
-}
 </script>
 <template>
   <!-- PAGE CONTENT! -->
