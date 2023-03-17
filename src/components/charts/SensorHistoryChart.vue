@@ -1,42 +1,3 @@
-<template>
-  <button class="fa fa-bar-chart settings-button" @click="(isSensorChartVisible = true), onChartOpen()"></button>
-  <div v-show="isSensorChartVisible" :id="sensorId" class="sensor-chart-wrapper">
-    <div class="sensor-chart-header">
-      <button class="fa fa-close close-chart w3-left" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isSensorChartVisible = false"></button>
-      <span class=" "> {{ labelName }} history</span>
-    </div>
-    <div class="sensor-chart-body">
-      <span v-show="chartTextShowed" class="chart-text-top">No data available</span>
-      <canvas :id="chartId" class="chart-item"></canvas>
-    </div>
-    <button class="chart-settings-menu" @click="isPropertiesMenuVisible = true">
-      <em class="fa fa-cog"></em>
-    </button>
-    <div v-show="isPropertiesMenuVisible" class="w3-col s12 m6 l5 chart-settings">
-      <button class="fa fa-close close-chart" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isPropertiesMenuVisible = false"></button>
-      <div style="margin-top: 1rem">
-        <label for="select" style="text-aling: left">Chart time range: </label>
-        <select :id="'time-select-' + sensorId" name="select" class="select-range" @change="selectedTimePeriod()">
-          <option value="1 hour">1 hour</option>
-          <option value="3 hours">3 hours</option>
-          <option value="6 hours">6 hours</option>
-          <option value="12 hours">12 hours</option>
-          <option value="1 day">1 day</option>
-          <option value="3 days">3 days</option>
-          <option value="7 days">7 days</option>
-          <option value="3 weeks">3 weeks</option>
-          <option value="1 month">1 month</option>
-          <option value="3 months">3 months</option>
-          <option value="1 year">1 year</option>
-          <option value="3 years">3 years</option>
-          <option value="5 years">5 years</option>
-          <option value="10 years">10 years</option>
-        </select>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Chart, ChartItem, registerables } from "chart.js";
@@ -210,7 +171,44 @@ onMounted(() => {
   }
 });
 </script>
-
+<template>
+  <button class="fa fa-bar-chart settings-button" @click="(isSensorChartVisible = true), onChartOpen()"></button>
+  <div v-show="isSensorChartVisible" :id="sensorId?.toString()" class="sensor-chart-wrapper">
+    <div class="sensor-chart-header">
+      <button class="fa fa-close close-chart w3-left" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isSensorChartVisible = false"></button>
+      <span class=" "> {{ labelName }} history</span>
+    </div>
+    <div class="sensor-chart-body">
+      <span v-show="chartTextShowed" class="chart-text-top">No data available</span>
+      <canvas :id="chartId" class="chart-item"></canvas>
+    </div>
+    <button class="chart-settings-menu" @click="isPropertiesMenuVisible = true">
+      <em class="fa fa-cog"></em>
+    </button>
+    <div v-show="isPropertiesMenuVisible" class="w3-col s12 m6 l5 chart-settings">
+      <button class="fa fa-close close-chart" style="padding: 0.5rem; background-color: #303030; border-radius: 0.6rem" @click="isPropertiesMenuVisible = false"></button>
+      <div style="margin-top: 1rem">
+        <label for="select" style="text-aling: left">Chart time range: </label>
+        <select :id="'time-select-' + sensorId" name="select" class="select-range" @change="selectedTimePeriod()">
+          <option value="1 hour">1 hour</option>
+          <option value="3 hours">3 hours</option>
+          <option value="6 hours">6 hours</option>
+          <option value="12 hours">12 hours</option>
+          <option value="1 day">1 day</option>
+          <option value="3 days">3 days</option>
+          <option value="7 days">7 days</option>
+          <option value="3 weeks">3 weeks</option>
+          <option value="1 month">1 month</option>
+          <option value="3 months">3 months</option>
+          <option value="1 year">1 year</option>
+          <option value="3 years">3 years</option>
+          <option value="5 years">5 years</option>
+          <option value="10 years">10 years</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 .sensor-chart-wrapper {
   width: 90%;

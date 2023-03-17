@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
+import GlobalAlert from "../../components/GlobalAlert.vue";
 import SideBar from "../../components/SideBar.vue";
 import TabNav from "../../components/TabNav.vue";
 
@@ -26,7 +27,7 @@ watchEffect(() => {
     <side-bar />
     <!-- CONTENT -->
     <div class="view-content pl-24">
-      <!-- <global-error /> -->
+      <global-alert />
       <router-view />
     </div>
   </div>
