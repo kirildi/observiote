@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ButtonControl from "./ButtonControl.vue";
-import Slider from "./Slider.vue";
+import Slider from "../sliders/Slider.vue";
 
 const props = defineProps<{
   sensorId?: string | number;

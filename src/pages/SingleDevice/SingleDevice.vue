@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, onBeforeMount, ref, watchEffect, inject, PropType } from "vue";
-
+import { useAlertsStore } from "../../stores/globalAlertStore";
 import Cookies from "js-cookie";
 import { HTTP } from "../../components/httpObject";
-import InteractiveMap from "../../components/interactive/InteractiveMap.vue";
-import SensorMenu from "../../components/interactive/SensorMenu.vue";
-import ButtonControl from "../../components/interactive/ButtonControl.vue";
-import SensorHistoryChart from "../../components/interactive/SensorHistoryChart.vue";
+import InteractiveMap from "../../components/maps/InteractiveMap.vue";
+import SensorMenu from "../../components/buttons/SensorMenu.vue";
+import ButtonControl from "../../components/buttons/ButtonControl.vue";
+import SensorHistoryChart from "../../components/charts/SensorHistoryChart.vue";
 import Sensor from "../../components/Sensor.vue";
 
 const props = defineProps<{
@@ -21,6 +21,7 @@ function createHttpBody(devId: any) {
 }
 
 const emitter = inject<string>("emitter");
+const store = useAlertsStore();
 
 const isInfoBoxShown = ref(false);
 const dataForInfoBox = ref({} as any);
@@ -94,14 +95,22 @@ onMounted(() => {
         sensorList = sessionStorage.getItem("sensorList");
         deviceContent.value = JSON.parse(sensorList);
         updateSensors(props.id);
-        //   store.dispatch("alertStore/removeError"); // Removes error on success, if any.
+        store.removeError();
       })
       .catch((e) => {
-        //   store.dispatch("alertStore/setError", {
-        //     type: "ERROR",
-        //     code: e.response.status,
-        //     message: e.response.statusText,
-        //   });
+        if (e.response) {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.response.status as string,
+            alertMessage: e.response.statusText as string,
+          });
+        } else {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.code as string,
+            alertMessage: e.message as string,
+          });
+        }
       });
   } else {
     deviceContent.value = JSON.parse(sensorList);
@@ -121,14 +130,22 @@ watchEffect(() => {
       .then(() => {
         sensorList = sessionStorage.getItem("sensorList");
         deviceContent.value = JSON.parse(sessionStorage.getItem("sensorList") as string);
-        //   store.dispatch("alertStore/removeError");
+        store.removeError();
       })
       .catch((e) => {
-        //   store.dispatch("alertStore/setError", {
-        //     type: "ERROR",
-        //     code: e.response.status,
-        //     message: e.response.statusText,
-        //   });
+        if (e.response) {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.response.status as string,
+            alertMessage: e.response.statusText as string,
+          });
+        } else {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.code as string,
+            alertMessage: e.message as string,
+          });
+        }
       });
   }, requestTime);
 
@@ -182,7 +199,7 @@ onUnmounted(() => {
             </span>
             <div class="">
               <span class="pl-4">
-                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="sensor.sensorId" :dev-id="id" />
+                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="JSON.stringify(sensor.sensorId)" :dev-id="id" />
               </span>
               <span class="pl-4">
                 <sensor-menu :sensor-id="sensor.sensorId" :sensor-type="sensor.sensorTypeId" />

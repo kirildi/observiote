@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watchEffect } from "vue";
-import InteractiveMap from "../../components/interactive/InteractiveMap.vue";
+import { useAlertsStore } from "../../stores/globalAlertStore";
+import InteractiveMap from "../../components/maps/InteractiveMap.vue";
 import Cookies from "js-cookie";
 
 import { HTTP } from "../../components/httpObject";
@@ -8,6 +9,8 @@ import { HTTP } from "../../components/httpObject";
 interface PropsId {
   id: number;
 }
+
+const store = useAlertsStore();
 
 function createHttpBody(_authToken: any) {
   return {
@@ -53,14 +56,22 @@ onMounted(() => {
         deviceList = sessionStorage.getItem("deviceList") as string;
         devicesData.value = JSON.parse(deviceList);
 
-        //   store.dispatch("alertStore/removeError");
+        store.removeError();
       })
       .catch((e) => {
-        //   store.dispatch("alertStore/setError", {
-        //     type: "ERROR",
-        //     code: e.response.status,
-        //     message: e.response.statusText,
-        //   });
+        if (e.response) {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.response.status as string,
+            alertMessage: e.response.statusText as string,
+          });
+        } else {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.code as string,
+            alertMessage: e.message as string,
+          });
+        }
       });
   }
 });
@@ -72,14 +83,22 @@ watchEffect(() => {
       .then(() => {
         deviceList = sessionStorage.getItem("deviceList") as string;
         devicesData.value = JSON.parse(deviceList);
-        //   store.dispatch("alertStore/removeError");
+        store.removeError();
       })
       .catch((e) => {
-        //   store.dispatch("alertStore/setError", {
-        //     type: "ERROR",
-        //     code: e.response.status,
-        //     message: e.response.statusText,
-        //   });
+        if (e.response) {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.response.status as string,
+            alertMessage: e.response.statusText as string,
+          });
+        } else {
+          store.setError({
+            alertType: "ERROR",
+            alertCode: e.code as string,
+            alertMessage: e.message as string,
+          });
+        }
       });
   }, requestInterval);
 });
