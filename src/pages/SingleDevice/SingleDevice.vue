@@ -119,7 +119,7 @@ onMounted(() => {
 });
 
 watchEffect(() => {
-  emitter.on("infoButton", (e: boolean) => {
+  emitter.on("infoButtonState", (e: boolean) => {
     isInfoBoxShown.value = e;
   });
 
@@ -163,16 +163,19 @@ onUnmounted(() => {
 </script>
 <template>
   <!-- DEVICE INFO -->
-  <div v-show="isInfoBoxShown" class="info__container">
-    <button class="fa fa-close info__close" @click="isInfoBoxShown = false">Close</button>
-    <div class="info__content">
+  <div v-show="isInfoBoxShown" class="info__container absolute w-10/12 mt-4 p-8 bg-neutral-600 rounded-lg">
+    <div class="flex justify-between">
+      <span class="">Device info:</span>
+      <button class="fa fa-close info__close mb-4 p-2" @click="isInfoBoxShown = false"><span class="px-4">Close</span></button>
+    </div>
+    <div class="info__content flex flex-auto gap-8 flex-row">
       <div v-if="dataForInfoBox.deviceImage === ''">
-        <img :id="'device-img-' + dataForInfoBox.deviceId" src="http://" alt=" No image found" class="w3-show w3-image" />
+        <img :id="'device-img-' + dataForInfoBox.deviceId" src="http://" alt=" No image found" class="w-1/3 object-cover rounded-2xl" />
       </div>
       <div v-else>
-        <img :id="'device-img-' + dataForInfoBox.deviceId" :src="dataForInfoBox.deviceImage" class="w3-show w3-image" :alt="dataForInfoBox.deviceName" />
+        <img :id="'device-img-' + dataForInfoBox.deviceId" :src="dataForInfoBox.deviceImage" class="w-72 object-cover rounded-2xl" :alt="dataForInfoBox.deviceName" />
       </div>
-      <div :id="'show-info-' + dataForInfoBox.deviceId">
+      <div :id="'show-info-' + dataForInfoBox.deviceId" class="w-1/3">
         <ul>
           <li>ID: {{ dataForInfoBox.deviceId }}</li>
           <li>Date created: {{ dataForInfoBox.deviceCreateDate }}</li>
@@ -180,7 +183,7 @@ onUnmounted(() => {
           <li>Coordinates: {{ dataForInfoBox.deviceCoordinates }}</li>
         </ul>
       </div>
-      <div class="w3-small text-wrap">Description: {{ dataForInfoBox.deviceDescription }}</div>
+      <div class="break-normal w-1/3">Description: {{ dataForInfoBox.deviceDescription }}</div>
     </div>
   </div>
 
@@ -235,5 +238,9 @@ onUnmounted(() => {
 <style scoped>
 .controllers__area {
   @apply col-start-3 col-span-1 row-span-2;
+}
+
+.info__container {
+  z-index: 1001;
 }
 </style>
