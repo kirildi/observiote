@@ -3,25 +3,16 @@ import Cookies from "js-cookie";
 import { onMounted, watchEffect, ref, inject } from "vue";
 // import { useRoute } from "vue-router"
 
-const emitter: any = inject("emitter");
+const emitter = inject("emitter");
 const title = ref("");
-const route = null;
-// const route = useRoute()
+
 const isInfoButtonShown = ref(false);
 let mySideBar = null;
 let viewContent = null;
 let user = ref({ username: "User" });
 
-function menuToggle() {
-  // if (mySideBar.style.display === "block") {
-  //   mySideBar.style.display = "none";
-  // } else {
-  //   mySideBar.style.display = "block";
-  // }
-}
-
 function emitInfoButton() {
-  emitter.emit("infoButton", true);
+  emitter.emit("infoButtonState", true);
 }
 
 watchEffect(() => {
@@ -29,13 +20,12 @@ watchEffect(() => {
   if (userCookie !== undefined) user = JSON.parse(userCookie);
   // title.value = route.meta.title;
 
-  emitter.on("updateInfoButton", (e: any) => {
+  emitter.on("updateInfoButton", (e: boolean) => {
     isInfoButtonShown.value = e;
   });
 });
 onMounted(() => {
   mySideBar = document.getElementById("mySidebar");
-  // eslint-disable-next-line prefer-destructuring
   viewContent = document.getElementsByClassName("view-content")[0];
 });
 </script>
