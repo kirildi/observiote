@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import AirPressure from "./sensors/AirPressure.vue";
-import Barometer from "./sensors/Barometer.vue";
-import BatteryLevel from "./sensors/BatteryLevel.vue";
-import DateTime from "./sensors/DateTime.vue";
-import Humidity from "./sensors/Humidity.vue";
-import Rain from "./sensors/Rain.vue";
-import SunLight from "./sensors/SunLight.vue";
-import Thermometer from "./sensors/Thermometer.vue";
-import WaterLevel from "./sensors/WaterLevel.vue";
+  import { SensorDataValue } from "../types/SensorDataType";
+  import AirPressure from "./sensors/AirPressure.vue";
+  import Barometer from "./sensors/Barometer.vue";
+  import BatteryLevel from "./sensors/BatteryLevel.vue";
+  import DateTime from "./sensors/DateTime.vue";
+  import Humidity from "./sensors/Humidity.vue";
+  import Rain from "./sensors/Rain.vue";
+  import SunLight from "./sensors/SunLight.vue";
+  import Thermometer from "./sensors/Thermometer.vue";
+  import WaterLevel from "./sensors/WaterLevel.vue";
 
-const props = defineProps<{
-  id: string;
-  content?: any;
-  data: any[];
-}>();
+  const props = defineProps<{
+    id: string;
+    content?: any;
+    data: SensorDataValue[];
+  }>();
 </script>
 
 <template>

@@ -1,110 +1,110 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watchEffect } from "vue";
-import { useAlertsStore } from "../../stores/globalAlertStore";
-import InteractiveMap from "../../components/maps/InteractiveMap.vue";
-import Cookies from "js-cookie";
+  import { onMounted, onUnmounted, ref, watchEffect } from "vue";
+  import { useAlertsStore } from "../../stores/globalAlertStore";
+  import InteractiveMap from "../../components/maps/InteractiveMap.vue";
+  import Cookies from "js-cookie";
 
-import { HTTP } from "../../components/httpObject";
+  import { HTTP } from "../../components/httpObject";
 
-interface PropsId {
-  id: number;
-}
-
-const store = useAlertsStore();
-
-function createHttpBody(_authToken: any) {
-  return {
-    authToken: _authToken,
-    // deviceId: "?",
-  };
-}
-
-const devicesData = ref([] as any[]);
-let authToken: string;
-let deviceList: string;
-let fetchDevicesInterval: NodeJS.Timer;
-
-async function fetchDevices() {
-  authToken = Cookies.get("token") as string;
-  const requestBody = createHttpBody(authToken);
-
-  const deviceRequest = await HTTP.post("/iotpp/rest/device_service", requestBody, {
-    headers: {
-      Accept: "*/*",
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
-
-  sessionStorage.setItem("deviceList", JSON.stringify(deviceRequest.data));
-}
-
-function toggleElementInfo(tempId: Number) {
-  const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
-  dev.classList.toggle("w3-hide");
-}
-
-onMounted(() => {
-  if (deviceList) {
-    devicesData.value = JSON.parse(deviceList);
-    console.log("devData", devicesData.value);
-  } else {
-    const res = fetchDevices();
-
-    res
-      .then(() => {
-        deviceList = sessionStorage.getItem("deviceList") as string;
-        devicesData.value = JSON.parse(deviceList);
-
-        store.removeError();
-      })
-      .catch((e) => {
-        if (e.response) {
-          store.setError({
-            alertType: "ERROR",
-            alertCode: e.response.status as string,
-            alertMessage: e.response.statusText as string,
-          });
-        } else {
-          store.setError({
-            alertType: "ERROR",
-            alertCode: e.code as string,
-            alertMessage: e.message as string,
-          });
-        }
-      });
+  interface PropsId {
+    id: number;
   }
-});
-watchEffect(() => {
-  const requestInterval = 600000;
-  fetchDevicesInterval = setInterval(() => {
-    const res = fetchDevices();
-    res
-      .then(() => {
-        deviceList = sessionStorage.getItem("deviceList") as string;
-        devicesData.value = JSON.parse(deviceList);
-        store.removeError();
-      })
-      .catch((e) => {
-        if (e.response) {
-          store.setError({
-            alertType: "ERROR",
-            alertCode: e.response.status as string,
-            alertMessage: e.response.statusText as string,
-          });
-        } else {
-          store.setError({
-            alertType: "ERROR",
-            alertCode: e.code as string,
-            alertMessage: e.message as string,
-          });
-        }
-      });
-  }, requestInterval);
-});
-onUnmounted(() => {
-  clearInterval(fetchDevicesInterval);
-});
+
+  const store = useAlertsStore();
+
+  function createHttpBody(_authToken: any) {
+    return {
+      authToken: _authToken,
+      // deviceId: "?",
+    };
+  }
+
+  const devicesData = ref([] as any[]);
+  let authToken: string;
+  let deviceList: string;
+  let fetchDevicesInterval: NodeJS.Timer;
+
+  async function fetchDevices() {
+    authToken = Cookies.get("token") as string;
+    const requestBody = createHttpBody(authToken);
+
+    const deviceRequest = await HTTP.post("/iotpp/rest/device_service", requestBody, {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    sessionStorage.setItem("deviceList", JSON.stringify(deviceRequest.data));
+  }
+
+  function toggleElementInfo(tempId: Number) {
+    const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
+    dev?.classList.toggle("w3-hide");
+  }
+
+  onMounted(() => {
+    if (deviceList) {
+      devicesData.value = JSON.parse(deviceList);
+      console.log("devData", devicesData.value);
+    } else {
+      const res = fetchDevices();
+
+      res
+        .then(() => {
+          deviceList = sessionStorage.getItem("deviceList") as string;
+          devicesData.value = JSON.parse(deviceList);
+
+          store.removeError();
+        })
+        .catch((e) => {
+          if (e.response) {
+            store.setError({
+              alertType: "ERROR",
+              alertCode: e.response.status as string,
+              alertMessage: e.response.statusText as string,
+            });
+          } else {
+            store.setError({
+              alertType: "ERROR",
+              alertCode: e.code as string,
+              alertMessage: e.message as string,
+            });
+          }
+        });
+    }
+  });
+  watchEffect(() => {
+    const requestInterval = 600000;
+    fetchDevicesInterval = setInterval(() => {
+      const res = fetchDevices();
+      res
+        .then(() => {
+          deviceList = sessionStorage.getItem("deviceList") as string;
+          devicesData.value = JSON.parse(deviceList);
+          store.removeError();
+        })
+        .catch((e) => {
+          if (e.response) {
+            store.setError({
+              alertType: "ERROR",
+              alertCode: e.response.status as string,
+              alertMessage: e.response.statusText as string,
+            });
+          } else {
+            store.setError({
+              alertType: "ERROR",
+              alertCode: e.code as string,
+              alertMessage: e.message as string,
+            });
+          }
+        });
+    }, requestInterval);
+  });
+  onUnmounted(() => {
+    clearInterval(fetchDevicesInterval);
+  });
 </script>
 <template>
   <div class="container relative p-4">

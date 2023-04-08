@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import Cookies from "js-cookie";
-import { onMounted, watchEffect, ref, inject } from "vue";
-// import { useRoute } from "vue-router"
+  import Cookies from "js-cookie";
+  import { onMounted, watchEffect, ref, inject } from "vue";
+  import { emitterKey } from "../globals/emitterKey";
 
-const emitter = inject("emitter");
-const title = ref("");
+  const emitter = inject(emitterKey);
+  const title = ref("");
 
-const isInfoButtonShown = ref(false);
-let mySideBar = null;
-let viewContent = null;
-let user = ref({ username: "User" });
+  const isInfoButtonShown = ref(false);
+  let mySideBar = null;
+  let viewContent = null;
+  let user = ref({ username: "User" });
 
-function emitInfoButton() {
-  emitter.emit("infoButtonState", true);
-}
+  function emitInfoButton() {
+    emitter?.emit("infoButtonState", true);
+  }
 
-watchEffect(() => {
-  const userCookie = Cookies.get("user");
-  if (userCookie !== undefined) user = JSON.parse(userCookie);
-  // title.value = route.meta.title;
+  watchEffect(() => {
+    const userCookie = Cookies.get("user");
+    if (userCookie !== undefined) user = JSON.parse(userCookie);
+    // title.value = route.meta.title;
 
-  emitter.on("updateInfoButton", (e: boolean) => {
-    isInfoButtonShown.value = e;
+    emitter?.on("updateInfoButton", (e: boolean) => {
+      isInfoButtonShown.value = e;
+    });
   });
-});
-onMounted(() => {
-  mySideBar = document.getElementById("mySidebar");
-  viewContent = document.getElementsByClassName("view-content")[0];
-});
+  onMounted(() => {
+    mySideBar = document.getElementById("mySidebar");
+    viewContent = document.getElementsByClassName("view-content")[0];
+  });
 </script>
 
 <template>
@@ -56,10 +56,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.nick-name {
-  padding: 0.6em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
-}
+  .nick-name {
+    padding: 0.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+  }
 </style>

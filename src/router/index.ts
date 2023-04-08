@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory,  RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Cookies from "js-cookie";
 
-const routes:Array<RouteRecordRaw> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "dashboard",
@@ -62,7 +62,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   let isUser = false;
   const user = Cookies.get("user");
-  
+
   if (user !== undefined) {
     isUser = JSON.parse(user).authState;
   }
@@ -70,7 +70,7 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !isUser) {
     router.push({ name: "login" });
   }
-  window.document.title = to.meta.title
+  window.document.title = to.meta.title;
 });
 
 export default router;
