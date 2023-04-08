@@ -6,7 +6,7 @@
   const props = defineProps<{
     id: number;
     type: string;
-    data: SensorDataValue[];
+    data: any[];
   }>();
 
   const isType = ref("basic");
@@ -106,9 +106,9 @@
       ctx.fillText("MIN: ", 90, 176);
       ctx.restore();
 
-      drawValue(`${props.data.max}${props.data.scale}`, 90, 50, "rgba(27,27,27,1.0)");
-      drawValue(`${props.data.now}${props.data.scale}`, 90, 120, "rgba(27,27,27,1.0)");
-      drawValue(`${props.data.min}${props.data.scale}`, 90, 194, "rgba(27,27,27,1.0)");
+      //drawValue(`${props.data.max}${props.data.scale}`, 90, 50, "rgba(27,27,27,1.0)");
+      //drawValue(`${props.data.now}${props.data.scale}`, 90, 120, "rgba(27,27,27,1.0)");
+      //drawValue(`${props.data.min}${props.data.scale}`, 90, 194, "rgba(27,27,27,1.0)");
     }
   }
   onMounted(() => {
