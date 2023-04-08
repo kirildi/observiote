@@ -1,18 +1,18 @@
-import { createRouter, createWebHistory,  RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Cookies from "js-cookie";
 
-const routes:Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "dashboard",
     props: true,
-    meta: { requiresAuth: true, title: "Devices" },
+    meta: { requiresAuth: true, title: "Dashboard" },
     component: () => import("../pages/Device/Device.vue"),
   },
   {
     path: "/login",
     name: "login",
-    meta: { title: "Login" },
+    meta: { requiresAuth: false, title: "Login" },
     component: () => import("../pages/Login/Login.vue"),
   },
   {
@@ -62,7 +62,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   let isUser = false;
   const user = Cookies.get("user");
-  
+
   if (user !== undefined) {
     isUser = JSON.parse(user).authState;
   }
@@ -70,7 +70,7 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !isUser) {
     router.push({ name: "login" });
   }
-  window.document.title = to.meta.title
+  typeof to.meta.title === "string" ? (window.document.title = to.meta.title) : "ObservIoTe";
 });
 
 export default router;

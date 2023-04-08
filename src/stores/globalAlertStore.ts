@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AlertState } from "../interfaces/interfaces";
+import { AlertState } from "../interfaces/AlertState";
 
 export const useAlertsStore = defineStore("alerts", {
   state: (): AlertState => {
