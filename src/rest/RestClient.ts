@@ -4,8 +4,6 @@ import { LoginDataInterface } from "../interfaces/LoginDataInterface";
 
 export default class RestClient {
   constructor() {
-    console.log(host);
-
     this.#axiosInstance = axios.create({
       baseURL: host.uri,
       headers: {
@@ -15,7 +13,9 @@ export default class RestClient {
     });
   }
   login = async (payload: LoginDataInterface) => {
-    await this.#axiosInstance.post(endpoint.loginEndpoint, JSON.stringify(payload));
+    //TODO should return iterface or type describing the response data, also handles the error
+    return await this.#axiosInstance.post(endpoint.loginEndpoint, JSON.stringify(payload));
   };
+
   #axiosInstance: AxiosInstance;
 }

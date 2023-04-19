@@ -5,6 +5,8 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
   envPrefix: "OIOTE",
   server: {
+    port: 8282,
+    host: true,
     proxy: {
       "/iotpp/rest/": "http://localhost:8285",
     },

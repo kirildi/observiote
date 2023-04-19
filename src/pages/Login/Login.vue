@@ -35,8 +35,6 @@
     const loginPayload = createPayload();
 
     const authRequest: any = restClient.login(loginPayload).catch((err) => {
-      console.log(authRequest);
-
       //TODO move inline error as separate component
       errorHidden.value = true;
       if (err.response !== undefined) {
@@ -50,45 +48,48 @@
       }, 10000);
     });
 
-    if (authRequest.status === 200) {
-      isAuthenticated = true;
+    //TODO fix this: temporary fix then() should be handled by restClient
+    authRequest.then((res: any) => {
+      if (res.status === 200) {
+        isAuthenticated = true;
 
-      // isUserNameValid = JSON.parse(authRequest.data.username)
-      // isPasswordValid = JSON.parse(authRequest.data.password)
+        // isUserNameValid = JSON.parse(authRequest.data.username)
+        // isPasswordValid = JSON.parse(authRequest.data.password)
 
-      //if (!isUserNameValid && !isPasswordValid) {}
+        //if (!isUserNameValid && !isPasswordValid) {}
 
-      const userCookie = Cookies.get("user");
+        const userCookie = Cookies.get("user");
 
-      const user: any = {
-        username: authRequest.data.username,
-        authState: isAuthenticated,
-      };
+        const user: any = {
+          username: res.data.username,
+          authState: isAuthenticated,
+        };
 
-      if (userCookie === undefined) {
-        Cookies.set("user", JSON.stringify(user), {
-          sameSite: "strict",
-          secure: false,
-          expires: 1,
-        });
+        if (userCookie === undefined) {
+          Cookies.set("user", JSON.stringify(user), {
+            sameSite: "strict",
+            secure: false,
+            expires: 1,
+          });
+        }
+
+        Cookies.set("token", res.data.token);
+        router.replace("/devices");
+        // }
+        // if (!isUserNameValid) {
+        //   const e = Error("Wrong username");
+        //   throw e.message;
+        // }
+        // if (!isPasswordValid) {
+        //   const e = Error("Wrong password");
+        //   throw e.message;
+        // }
+        // if (!isUserNameValid && !isPasswordValid) {
+        //   const e = Error("Wrong username and password");
+        //   throw e.message;
+        // }
       }
-
-      Cookies.set("token", authRequest.data.token);
-      router.replace("/devices");
-      // }
-      // if (!isUserNameValid) {
-      //   const e = Error("Wrong username");
-      //   throw e.message;
-      // }
-      // if (!isPasswordValid) {
-      //   const e = Error("Wrong password");
-      //   throw e.message;
-      // }
-      // if (!isUserNameValid && !isPasswordValid) {
-      //   const e = Error("Wrong username and password");
-      //   throw e.message;
-      // }
-    }
+    });
   }
 </script>
 
