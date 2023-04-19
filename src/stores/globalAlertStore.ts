@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { AlertState } from "../interfaces/AlertState";
+import { AlertStateInterface } from "../interfaces/AlertStateInterface";
 
 export const useAlertsStore = defineStore("alerts", {
-  state: (): AlertState => {
+  state: (): AlertStateInterface => {
     return {
       triggered: false,
       alertType: "",
@@ -12,7 +12,7 @@ export const useAlertsStore = defineStore("alerts", {
   },
 
   actions: {
-    setError(payload: AlertState) {
+    setError(payload: AlertStateInterface) {
       this.alertType = payload.alertType;
       this.alertCode = payload.alertCode;
       this.alertMessage = payload.alertMessage;

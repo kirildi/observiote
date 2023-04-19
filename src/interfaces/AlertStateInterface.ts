@@ -1,4 +1,4 @@
-export interface AlertState {
+export interface AlertStateInterface {
   triggered?: boolean;
   alertType: string;
   alertCode: string;
