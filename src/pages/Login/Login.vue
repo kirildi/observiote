@@ -1,99 +1,96 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-// import bcrypt from "bcryptjs"
-import Cookies from "js-cookie";
-import { HTTP } from "../../components/httpObject";
-const router = useRouter();
+  import { ref } from "vue";
+  import { useRouter } from "vue-router";
+  // import bcrypt from "bcryptjs"
+  import Cookies from "js-cookie";
+  import RestClient from "../../rest/RestClient";
+  import { LoginDataInterface } from "../../interfaces/LoginDataInterface";
 
-const errorHidden = ref(false);
-const formError = ref("");
+  const restClient = new RestClient();
+  const router = useRouter();
 
-const username = ref("");
-const password = ref("");
+  const errorHidden = ref(false);
+  const formError = ref("");
 
-let isAuthenticated = false;
+  const username = ref("");
+  const password = ref("");
 
-type loginData = {
-  username: string;
-  password: string;
-};
+  let isAuthenticated = false;
 
-// async function hashPassword(pass) {
-//   const saltRounds = 10
-//   const hashed = await bcrypt.hash(pass, saltRounds)
-//   return hashed
-// }
+  // async function hashPassword(pass) {
+  //   const saltRounds = 10
+  //   const hashed = await bcrypt.hash(pass, saltRounds)
+  //   return hashed
+  // }
 
-function createHttpBody(data: loginData): string {
-  return `{
-        "username":"${data.username}",
-        "password":"${data.password}"
-      }`;
-}
-
-async function login() {
-  const isUserNameValid = false;
-  const isPasswordValid = false;
-
-  let data: loginData = { username: username.value, password: password.value };
-
-  const authData = createHttpBody(data);
-
-  const authRequest: any = await HTTP.post("/iotpp/rest/auth_service", authData).catch((err) => {
-    errorHidden.value = true;
-    if (err.response !== undefined) {
-      formError.value = `*${err.response.status} ${err.response.statusText}`;
-    } else {
-      formError.value = `*${err.message}`;
-    }
-    setTimeout(() => {
-      errorHidden.value = false;
-      formError.value = "";
-    }, 10000);
-  });
-
-  if (authRequest.status === 200) {
-    isAuthenticated = true;
-
-    // isUserNameValid = JSON.parse(authRequest.data.username)
-    // isPasswordValid = JSON.parse(authRequest.data.password)
-
-    //if (!isUserNameValid && !isPasswordValid) {}
-
-    const userCookie = Cookies.get("user");
-
-    const user: any = {
-      username: data.username,
-      authState: isAuthenticated,
-    };
-
-    if (userCookie === undefined) {
-      Cookies.set("user", JSON.stringify(user), {
-        sameSite: "strict",
-        secure: false,
-        expires: 1,
-      });
-    }
-    Cookies.set("token", authRequest.data.token);
-
-    Cookies.set("token", authRequest.data.token);
-    router.replace("/devices");
-    // }
-    // if (!isUserNameValid) {
-    //   const e = Error("Wrong username");
-    //   throw e.message;
-    // }
-    // if (!isPasswordValid) {
-    //   const e = Error("Wrong password");
-    //   throw e.message;
-    // }
-    // if (!isUserNameValid && !isPasswordValid) {
-    //   const e = Error("Wrong username and password");
-    //   throw e.message;
-    // }
+  function createPayload(): LoginDataInterface {
+    const payload: LoginDataInterface = { username: username.value, password: password.value };
+    return payload;
   }
-}
+
+  async function login() {
+    const isUserNameValid = false;
+    const isPasswordValid = false;
+
+    const loginPayload = createPayload();
+
+    const authRequest: any = restClient.login(loginPayload).catch((err) => {
+      //TODO move inline error as separate component
+      errorHidden.value = true;
+      if (err.response !== undefined) {
+        formError.value = `*${err.response.status} ${err.response.statusText}`;
+      } else {
+        formError.value = `*${err.message}`;
+      }
+      setTimeout(() => {
+        errorHidden.value = false;
+        formError.value = "";
+      }, 10000);
+    });
+
+    //TODO fix this: temporary fix then() should be handled by restClient
+    authRequest.then((res: any) => {
+      if (res.status === 200) {
+        isAuthenticated = true;
+
+        // isUserNameValid = JSON.parse(authRequest.data.username)
+        // isPasswordValid = JSON.parse(authRequest.data.password)
+
+        //if (!isUserNameValid && !isPasswordValid) {}
+
+        const userCookie = Cookies.get("user");
+
+        const user: any = {
+          username: res.data.username,
+          authState: isAuthenticated,
+        };
+
+        if (userCookie === undefined) {
+          Cookies.set("user", JSON.stringify(user), {
+            sameSite: "strict",
+            secure: false,
+            expires: 1,
+          });
+        }
+
+        Cookies.set("token", res.data.token);
+        router.replace("/devices");
+        // }
+        // if (!isUserNameValid) {
+        //   const e = Error("Wrong username");
+        //   throw e.message;
+        // }
+        // if (!isPasswordValid) {
+        //   const e = Error("Wrong password");
+        //   throw e.message;
+        // }
+        // if (!isUserNameValid && !isPasswordValid) {
+        //   const e = Error("Wrong username and password");
+        //   throw e.message;
+        // }
+      }
+    });
+  }
 </script>
 
 <template>
@@ -119,8 +116,8 @@ async function login() {
 </template>
 
 <style scoped>
-.login {
-  color: #f4efde;
-  background-color: #303030;
-}
+  .login {
+    color: #f4efde;
+    background-color: #303030;
+  }
 </style>
