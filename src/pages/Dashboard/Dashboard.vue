@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
-import { useRoute } from "vue-router";
-import GlobalAlert from "../../components/GlobalAlert.vue";
-import SideBar from "../../components/SideBar.vue";
-import TabNav from "../../components/TabNav.vue";
+  import { ref, watchEffect } from "vue";
+  import { useRoute } from "vue-router";
+  import GlobalAlert from "../../components/alerts/GlobalAlert.vue";
+  import SideBar from "../../components/SideBar.vue";
+  import TabNav from "../../components/TabNav.vue";
 
-const isLoggedIn = ref(false);
-const route = useRoute();
+  const isLoggedIn = ref(false);
+  const route = useRoute();
 
-watchEffect(() => {
-  if (route.fullPath !== "/login") {
-    isLoggedIn.value = true;
-  } else {
-    isLoggedIn.value = false;
-  }
-});
+  watchEffect(() => {
+    if (route.fullPath !== "/login") {
+      isLoggedIn.value = true;
+    } else {
+      isLoggedIn.value = false;
+    }
+  });
 </script>
 <template>
   <!-- PAGE CONTENT! -->
