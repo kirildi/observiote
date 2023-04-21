@@ -1,20 +1,19 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-// import { useStore } from "vuex"
-import Cookies from "js-cookie";
+  import { useRouter } from "vue-router";
+  // import { useStore } from "vuex"
+  import Cookies from "js-cookie";
 
-const router = useRouter();
-// const store = useStore()
+  const router = useRouter();
+  // const store = useStore()
 
-const store = null;
-function logout() {
-  // TODO may be could notify the server that user is logged out
-  // store.commit("loginStore/unSetAuthState");
+  const store = null;
+  function logout() {
+    // TODO may be could notify the server that user is logged out
+    // store.commit("loginStore/unSetAuthState");
 
-  Cookies.remove("user");
-  Cookies.remove("token");
-  router.replace({ name: "login" });
-}
+    Cookies.remove("user");
+    router.replace({ name: "login" });
+  }
 </script>
 
 <template>

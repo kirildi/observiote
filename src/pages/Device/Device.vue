@@ -5,6 +5,7 @@
   import Cookies from "js-cookie";
 
   import { HTTP } from "../../components/httpObject";
+  import { UserInterface } from "../../interfaces/UserInterface";
 
   interface PropsId {
     id: number;
@@ -12,10 +13,9 @@
 
   const store = useAlertsStore();
 
-  function createHttpBody(_authToken: any) {
+  function createHttpBody(userToken: string | undefined) {
     return {
-      authToken: _authToken,
-      // deviceId: "?",
+      authToken: userToken,
     };
   }
 
@@ -25,8 +25,8 @@
   let fetchDevicesInterval: NodeJS.Timer;
 
   async function fetchDevices() {
-    authToken = Cookies.get("token") as string;
-    const requestBody = createHttpBody(authToken);
+    let userCookie: UserInterface = JSON.parse(Cookies.get("user") ?? "");
+    const requestBody = createHttpBody(userCookie.token);
 
     const deviceRequest = await HTTP.post("/iotpp/rest/device_service", requestBody, {
       headers: {
