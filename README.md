@@ -3,8 +3,22 @@
 # observiote
 
 Simple IoT devices monitoring App
+ 
 
-## Recommended IDE Setup
+## API Information
+
+Application does't support CRUD operations at the moment. 
+The main idea was to monitoring mostly small or hobby IoT devices, which are already added to the database,
+and they send/store their data via another API service on local(private) server.
+
+## Setup
+
+Donwload the project and firstly run
+`npm install` to fetch the needed packages (check `package.json`)
+
+To build it run `npm build` then move the content of the `dist` folder in the desired static server root directory/subdirectory. 
+
+### Recommended IDE Setup
 
 Vue 3 + Typescript + Vite
 
