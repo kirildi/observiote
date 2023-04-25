@@ -1,43 +1,18 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted, ref, watchEffect } from "vue";
   import { useAlertsStore } from "../../stores/globalAlertStore";
+  import RestClient from "../../rest/RestClient";
   import InteractiveMap from "../../components/maps/InteractiveMap.vue";
-  import Cookies from "js-cookie";
+  import { OIOTEResponseType } from "../../types/OIOTEResponseType";
 
-  import { HTTP } from "../../components/httpObject";
-  import { UserInterface } from "../../interfaces/UserInterface";
-
-  interface PropsId {
-    id: number;
-  }
-
-  const store = useAlertsStore();
-
-  function createHttpBody(userToken: string | undefined) {
-    return {
-      authToken: userToken,
-    };
-  }
+  const globalAlertStore = useAlertsStore();
+  const restClient = new RestClient();
 
   const devicesData = ref([] as any[]);
-  let authToken: string;
   let deviceList: string;
+  const storageEntry: string = "deviceList";
   let fetchDevicesInterval: NodeJS.Timer;
-
-  async function fetchDevices() {
-    let userCookie: UserInterface = JSON.parse(Cookies.get("user") ?? "");
-    const requestBody = createHttpBody(userCookie.token);
-
-    const deviceRequest = await HTTP.post("/iotpp/rest/device_service", requestBody, {
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
-
-    sessionStorage.setItem("deviceList", JSON.stringify(deviceRequest.data));
-  }
+  const requestInterval = 600000; //in milliseconds
 
   function toggleElementInfo(tempId: Number) {
     const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
@@ -45,61 +20,38 @@
   }
 
   onMounted(() => {
-    if (deviceList) {
-      devicesData.value = JSON.parse(deviceList);
-      console.log("devData", devicesData.value);
-    } else {
-      const res = fetchDevices();
+    const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageEntry);
 
-      res
-        .then(() => {
-          deviceList = sessionStorage.getItem("deviceList") as string;
-          devicesData.value = JSON.parse(deviceList);
+    deviceRequest
+      .then((res) => {
+        deviceList = sessionStorage.getItem(storageEntry) ?? "";
+        if (!deviceList) {
+          devicesData.value = [];
+          throw { status: "000", statusText: "No stored device data found" };
+        }
+        devicesData.value = JSON.parse(deviceList);
 
-          store.removeError();
-        })
-        .catch((e) => {
-          if (e.response) {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.response.status as string,
-              alertMessage: e.response.statusText as string,
-            });
-          } else {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.code as string,
-              alertMessage: e.message as string,
-            });
-          }
-        });
-    }
+        if (globalAlertStore.triggered) globalAlertStore.removeError();
+      })
+      .catch((err) => {
+        globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+      });
   });
   watchEffect(() => {
-    const requestInterval = 600000;
     fetchDevicesInterval = setInterval(() => {
-      const res = fetchDevices();
-      res
-        .then(() => {
-          deviceList = sessionStorage.getItem("deviceList") as string;
-          devicesData.value = JSON.parse(deviceList);
-          store.removeError();
-        })
-        .catch((e) => {
-          if (e.response) {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.response.status as string,
-              alertMessage: e.response.statusText as string,
-            });
-          } else {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.code as string,
-              alertMessage: e.message as string,
-            });
-          }
-        });
+      if (!deviceList) {
+        const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageEntry);
+
+        deviceRequest
+          .then((res) => {
+            deviceList = sessionStorage.getItem(storageEntry) ?? "";
+            devicesData.value = JSON.parse(deviceList);
+            if (globalAlertStore.triggered) globalAlertStore.removeError();
+          })
+          .catch((err) => {
+            globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+          });
+      }
     }, requestInterval);
   });
   onUnmounted(() => {
@@ -108,7 +60,7 @@
 </script>
 <template>
   <div class="container relative p-4">
-    <div v-if="!devicesData" class="device-content p-4">
+    <div v-if="!devicesData || devicesData.length === 0" class="device-content p-4">
       <h3>Notice:</h3>
       <p>Devices, should be automatically displayed here. If you read this there should be an error or no connection to the server.</p>
     </div>
