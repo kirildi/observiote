@@ -1,11 +1,9 @@
 <script setup lang="ts">
   import { ref } from "vue";
   import { useRouter } from "vue-router";
-  // import bcrypt from "bcryptjs"
-  import Cookies from "js-cookie";
   import RestClient from "../../rest/RestClient";
-  import { LoginDataInterface } from "../../interfaces/LoginDataInterface";
   import LineAlert from "../../components/alerts/LineAlert.vue";
+  import { LoginDataInterface } from "../../interfaces/LoginDataInterface";
   import { OIOTEResponseType } from "../../types/OIOTEResponseType";
 
   const restClient = new RestClient();
