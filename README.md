@@ -1,4 +1,4 @@
-![NodeJS](https://github.com/k-d-ivanov/observiote/actions/workflows/nodejs.yml/badge.svg)  
+![NodeJS](https://github.com/kirildi/observiote/actions/workflows/nodejs.yml/badge.svg)  
 
 # observiote
 
