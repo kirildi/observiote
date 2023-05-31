@@ -46,7 +46,7 @@ export default class RestClient {
     });
   };
 
-  fetchDevices = (storageEntry: string): Promise<OIOTEResponseType> => {
+  fetchDevices = (storageItem: string): Promise<OIOTEResponseType> => {
     return new Promise((resolve, reject) => {
       let userCookie: UserInterface = JSON.parse(Cookies.get("user") ?? "");
       const noUserError = { id: "error", status: "*", statusTest: "No user is found! Try re-login again." };
@@ -64,7 +64,38 @@ export default class RestClient {
               Authorization: `Bearer ${userCookie.token}`,
             },
           });
-          this.#setSessionStore(storageEntry, response.data);
+          this.#setSessionStore(storageItem, response.data);
+
+          const successType: OIOTEResponseType = { id: "success", status: response.status, statusText: response.statusText };
+          resolve(successType);
+        } catch (error: any) {
+          const errorType: OIOTEResponseType = { id: "error", status: error.response.status, statusText: error.response.statusText };
+          reject(errorType);
+        }
+      };
+      actionPost();
+    });
+  };
+
+  updateSensors = (deviceId: any, storageItem: string): Promise<OIOTEResponseType> => {
+    return new Promise((resolve, reject) => {
+      let userCookie: UserInterface = JSON.parse(Cookies.get("user") ?? "");
+      const noUserError = { id: "error", status: "*", statusTest: "No user is found! Try re-login again." };
+      if (!userCookie) {
+        reject(noUserError);
+      }
+
+      const actionPost = async () => {
+        try {
+          const requestBody = { deviceId: deviceId, authToken: userCookie.token };
+          const response = await this.#axiosInstance.post(endpoint.sensorEndpoint, JSON.stringify(requestBody), {
+            headers: {
+              Accept: "*/*",
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userCookie.token}`,
+            },
+          });
+          this.#setSessionStore(storageItem, response.data);
 
           const successType: OIOTEResponseType = { id: "success", status: response.status, statusText: response.statusText };
           resolve(successType);
@@ -79,7 +110,7 @@ export default class RestClient {
 
   #axiosInstance: AxiosInstance;
   #isUserAuthenticated = false;
-  #setSessionStore = (newStoreEntry: string, responseData: any) => {
-    sessionStorage.setItem(newStoreEntry, JSON.stringify(responseData));
+  #setSessionStore = (storeItem: string, itemData: any) => {
+    sessionStorage.setItem(storeItem, JSON.stringify(itemData));
   };
 }

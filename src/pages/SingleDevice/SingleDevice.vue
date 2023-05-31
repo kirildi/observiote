@@ -1,17 +1,17 @@
 <script setup lang="ts">
-  import { onMounted, onUnmounted, onBeforeMount, ref, watchEffect, inject, PropType } from "vue";
+  import { onMounted, onUnmounted, inject, ref, watchEffect } from "vue";
   import { useAlertsStore } from "../../stores/globalAlertStore";
-  import Cookies from "js-cookie";
-  import { HTTP } from "../../components/httpObject";
+  import RestClient from "../../rest/RestClient";
+  import { OIOTEResponseType } from "../../types/OIOTEResponseType";
+
   import InteractiveMap from "../../components/maps/InteractiveMap.vue";
   import SensorMenu from "../../components/buttons/SensorMenu.vue";
   import ButtonControl from "../../components/buttons/ButtonControl.vue";
   import SensorHistoryChart from "../../components/charts/SensorHistoryChart.vue";
   import Sensor from "../../components/Sensor.vue";
   import { emitterKey } from "../../globals/emitterKey";
-
   const props = defineProps<{
-    id: number | string;
+    device: any;
   }>();
 
   function createHttpBody(devId: any) {
@@ -20,103 +20,48 @@
       deviceId: devId,
     };
   }
-
   const emitter = inject(emitterKey);
-  const store = useAlertsStore();
+
+  const globalAlertStore = useAlertsStore();
+  const restClient = new RestClient();
 
   const isInfoBoxShown = ref(false);
-  const dataForInfoBox = ref({} as any);
+  const infoBoxData = ref({} as any);
+  const storageItem: string = "sensorList";
 
-  const devicesList = ref([] as Array<any>);
-  const deviceContent = ref([] as any[]);
+  let sensorList = ref([] as any[]);
   const sensorData = ref([] as any[]);
   const actuatorContent = ref({} as any);
 
-  let authToken: string | undefined = "";
-  let sensorList: any = null;
-  let fetchSensorInterval: NodeJS.Timer;
   let updateSensorInterval: NodeJS.Timer;
+  const requestIntervalPeriod = 19000;
 
-  async function fetchSensors(devId: any) {
-    const requestBody = createHttpBody(devId);
+  function fetchSenorData() {
+    const getSensorsRequest: Promise<OIOTEResponseType> = restClient.updateSensors(props.device.deviceId, storageItem);
 
-    const sensorRequest = await HTTP.post("/iotpp/rest/sensor_service", requestBody, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
-    sessionStorage.setItem("sensorList", JSON.stringify(sensorRequest.data));
+    getSensorsRequest
+      .then(() => {
+        let storedSensors = sessionStorage.getItem(storageItem);
+        if (!storedSensors) {
+          throw { status: "000", statusText: "No stored sensors data found" };
+        } else {
+          sensorList = JSON.parse(storedSensors);
+          if (globalAlertStore.triggered) globalAlertStore.removeError();
+        }
+      })
+      .catch((err) => {
+        globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+      });
   }
 
-  async function updateSensors(devId: any) {
-    const body = {
-      deviceId: devId,
-    };
-    const sensorGetData = await HTTP.post("/iotpp/rest/sensor_service/sensor_value", body, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    }).then((response) => {
-      sensorData.value = []; // TODO better way for clearing array here
-
-      for (let i = 0; i < deviceContent.value.length; i += 1) {
-        sensorData.value.push({
-          sensorId: response.data[i].sensorId,
-          sensorData: response.data[i].constructedDataPacketValue,
-        });
-      }
-    });
-  }
-
-  onBeforeMount(() => {
-    // Fetching the device list from session, used for info box.
-    devicesList.value = JSON.parse(sessionStorage.getItem("deviceList") as string);
-
-    for (let index of devicesList.value) {
-      if (String(index.deviceId) === props.id) {
-        dataForInfoBox.value = index;
-        break;
-      }
-    }
-  });
   onMounted(() => {
-    authToken = Cookies.get("token");
     emitter?.emit("updateInfoButton", true);
 
-    window.document.title = dataForInfoBox.value.deviceName; // Updates page title
+    window.document.title = infoBoxData.value.deviceName; // Updates page title
 
-    document.querySelectorAll(".tabs")[0].innerHTML = dataForInfoBox.value.deviceName; // Updates content header title
+    document.querySelectorAll(".tabs")[0].innerHTML = infoBoxData.value.deviceName; // Updates content header title
 
-    if (!sensorList) {
-      const fetchResult = fetchSensors(props.id);
-      fetchResult
-        .then(() => {
-          sensorList = sessionStorage.getItem("sensorList");
-          deviceContent.value = JSON.parse(sensorList);
-          updateSensors(props.id);
-          store.removeError();
-        })
-        .catch((e) => {
-          if (e.response) {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.response.status as string,
-              alertMessage: e.response.statusText as string,
-            });
-          } else {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.code as string,
-              alertMessage: e.message as string,
-            });
-          }
-        });
-    } else {
-      deviceContent.value = JSON.parse(sensorList);
-      updateSensors(props.id);
-    }
+    fetchSenorData();
   });
 
   watchEffect(() => {
@@ -124,39 +69,12 @@
       isInfoBoxShown.value = e;
     });
 
-    const requestTime = 19000;
-    fetchSensorInterval = setInterval(() => {
-      const res = fetchSensors(props.id);
-      res
-        .then(() => {
-          sensorList = sessionStorage.getItem("sensorList");
-          deviceContent.value = JSON.parse(sessionStorage.getItem("sensorList") as string);
-          store.removeError();
-        })
-        .catch((e) => {
-          if (e.response) {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.response.status as string,
-              alertMessage: e.response.statusText as string,
-            });
-          } else {
-            store.setError({
-              alertType: "ERROR",
-              alertCode: e.code as string,
-              alertMessage: e.message as string,
-            });
-          }
-        });
-    }, requestTime);
-
     updateSensorInterval = setInterval(() => {
-      updateSensors(props.id);
-    }, 20000);
+      fetchSenorData();
+    }, requestIntervalPeriod);
   });
   // When you leave Sensor page
   onUnmounted(() => {
-    clearInterval(fetchSensorInterval);
     clearInterval(updateSensorInterval);
     actuatorContent.value = {};
     emitter?.emit("updateInfoButton", false);
@@ -170,40 +88,40 @@
       <button class="fa fa-close info__close mb-4 p-2" @click="isInfoBoxShown = false"><span class="px-4">Close</span></button>
     </div>
     <div class="info__content flex flex-auto gap-8 flex-row">
-      <div v-if="dataForInfoBox.deviceImage === ''">
-        <img :id="'device-img-' + dataForInfoBox.deviceId" src="http://" alt=" No image found" class="w-1/3 object-cover rounded-2xl" />
+      <div v-if="infoBoxData.deviceImage === ''">
+        <img :id="'device-img-' + infoBoxData.deviceId" src="http://" alt=" No image found" class="w-1/3 object-cover rounded-2xl" />
       </div>
       <div v-else>
-        <img :id="'device-img-' + dataForInfoBox.deviceId" :src="dataForInfoBox.deviceImage" class="w-72 object-cover rounded-2xl" :alt="dataForInfoBox.deviceName" />
+        <img :id="'device-img-' + infoBoxData.deviceId" :src="infoBoxData.deviceImage" class="w-72 object-cover rounded-2xl" :alt="infoBoxData.deviceName" />
       </div>
-      <div :id="'show-info-' + dataForInfoBox.deviceId" class="w-1/3">
+      <div :id="'show-info-' + infoBoxData.deviceId" class="w-1/3">
         <ul>
-          <li>ID: {{ dataForInfoBox.deviceId }}</li>
-          <li>Date created: {{ dataForInfoBox.deviceCreateDate }}</li>
-          <li>Date modified:{{ dataForInfoBox.deviceLastModifyDate }}</li>
-          <li>Coordinates: {{ dataForInfoBox.deviceCoordinates }}</li>
+          <li>ID: {{ infoBoxData.deviceId }}</li>
+          <li>Date created: {{ infoBoxData.deviceCreateDate }}</li>
+          <li>Date modified:{{ infoBoxData.deviceLastModifyDate }}</li>
+          <li>Coordinates: {{ infoBoxData.deviceCoordinates }}</li>
         </ul>
       </div>
-      <div class="break-normal w-1/3">Description: {{ dataForInfoBox.deviceDescription }}</div>
+      <div class="break-normal w-1/3">Description: {{ infoBoxData.deviceDescription }}</div>
     </div>
   </div>
 
   <!-- SENSORS -->
   <div class="single__device container relative p-8">
     <div class="grid grid-cols-3 grid-rows-2 grid-flow-col gap-8 h-full">
-      <div v-if="!deviceContent || deviceContent.length === 0" class="p-4">
+      <div v-if="!sensorList || sensorList.length === 0" class="p-4">
         <p>Device does't have sensors at this moment.</p>
         <p>NOTICE: Device content is updated automatically.</p>
       </div>
       <div v-else class="sensors__area row-span-2 col-span-2 col-start-1 flex flex-row flex-wrap gap-8 basis-60">
-        <div v-for="sensor in deviceContent" :key="sensor.sensorId" class="sensor__cell p-4 bg-zinc-700 rounded-xl">
+        <div v-for="sensor in sensorList" :key="sensor.sensorId" class="sensor__cell p-4 bg-zinc-700 rounded-xl">
           <div class="sensor__header w-60 h-8 flex flex-row flex-auto place-content-between">
             <span class=" ">
               {{ sensor.sensorTypeId.sensorTypeName }}
             </span>
             <div class="">
               <span class="pl-4">
-                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="JSON.stringify(sensor.sensorId)" :dev-id="id" />
+                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="JSON.stringify(sensor.sensorId)" :dev-id="device.deviceId" />
               </span>
               <span class="pl-4">
                 <sensor-menu :sensor-id="sensor.sensorId" :sensor-type="sensor.sensorTypeId" />
@@ -229,7 +147,7 @@
       </div>
       <div v-else class="controllers__area col-start-3 col-span-1 row-span-1">
         <div class="actuators-content">
-          <button-control :id="props.id" name="button" />
+          <button-control :id="device.deviceId" name="button" />
           <!-- <slider name="slider" /> -->
         </div>
       </div>

@@ -10,9 +10,9 @@
 
   const devicesData = ref([] as any[]);
   let deviceList: string;
-  const storageEntry: string = "deviceList";
+  const storageItem: string = "deviceList";
   let fetchDevicesInterval: NodeJS.Timer;
-  const requestInterval = 600000; //in milliseconds
+  const requestIntervalPeriod = 600000; //in milliseconds
 
   function toggleElementInfo(tempId: Number) {
     const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
@@ -20,11 +20,11 @@
   }
 
   onMounted(() => {
-    const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageEntry);
+    const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
 
     deviceRequest
       .then((res) => {
-        deviceList = sessionStorage.getItem(storageEntry) ?? "";
+        deviceList = sessionStorage.getItem(storageItem) ?? "";
         if (!deviceList) {
           devicesData.value = [];
           throw { status: "000", statusText: "No stored device data found" };
@@ -40,11 +40,11 @@
   watchEffect(() => {
     fetchDevicesInterval = setInterval(() => {
       if (!deviceList) {
-        const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageEntry);
+        const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
 
         deviceRequest
           .then((res) => {
-            deviceList = sessionStorage.getItem(storageEntry) ?? "";
+            deviceList = sessionStorage.getItem(storageItem) ?? "";
             devicesData.value = JSON.parse(deviceList);
             if (globalAlertStore.triggered) globalAlertStore.removeError();
           })
@@ -52,7 +52,7 @@
             globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
           });
       }
-    }, requestInterval);
+    }, requestIntervalPeriod);
   });
   onUnmounted(() => {
     clearInterval(fetchDevicesInterval);
@@ -71,7 +71,7 @@
             <router-link
               :to="{
                 name: 'device',
-                params: { id: device.deviceId },
+                params: { device: device },
               }">
               <div v-if="device.deviceImage === ''">
                 <img :id="'device-img-' + device.deviceId" src="http://" alt=" No image found" class="w-72 object-cover rounded-t-3xl opacity-80" />
