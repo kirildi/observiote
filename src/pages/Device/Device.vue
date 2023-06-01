@@ -65,23 +65,23 @@
       <p>Devices, should be automatically displayed here. If you read this there should be an error or no connection to the server.</p>
     </div>
     <div v-else class="device-content p-4 grid grid-cols-3 grid-rows-2 grid-flow-col gap-4">
-      <ul class="flex flex-auto flex-row gap-8 row=span-2">
+      <ul class="flex flex-auto flex-row gap-4 row=span-2">
         <li v-for="(device, index) in devicesData" :key="index" class="device-element container">
           <div class="w-72 h-64">
             <router-link
               :to="{
                 name: 'device',
-                params: { device: device },
+                params: { id: device.deviceId },
               }">
               <div v-if="device.deviceImage === ''">
-                <img :id="'device-img-' + device.deviceId" src="http://" alt=" No image found" class="w-72 object-cover rounded-t-3xl opacity-80" />
+                <img :id="'device-img-' + device.deviceId" src="http://" alt=" No image found" class="w-72 h-52 object-cover rounded-t-xl p-4 bg-zinc-900 opacity-80" />
               </div>
               <div v-else class=" ">
-                <img :id="'device-img-' + device.deviceId" :src="device.deviceImage" class="w-72 object-cover rounded-t-3xl opacity-80" :alt="device.deviceName" />
+                <img :id="'device-img-' + device.deviceId" :src="device.deviceImage" class="w-72 h-52 object-cover rounded-t-xl p-4 bg-zinc-900 opacity-80" :alt="`${device.deviceName}: Image link broken`" />
               </div>
 
               <!--DEVICE NAME-->
-              <div class="device-description p-4 overflow-ellipsis bg-zinc-700 rounded-b-xl">
+              <div class="device-description w-72 p-4 overflow-ellipsis bg-zinc-700 rounded-b-xl">
                 {{ device.deviceName }}
               </div>
             </router-link>
