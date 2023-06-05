@@ -1,41 +1,39 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { Chart, ChartItem, registerables } from "chart.js";
-import "chartjs-adapter-luxon";
-import Cookies from "js-cookie";
-import { HTTP } from "../httpObject";
-import { HtmlAttributes } from "csstype";
+  import { onMounted, ref } from "vue";
+  import { Chart, ChartItem, registerables } from "chart.js";
+  import "chartjs-adapter-luxon";
+  import Cookies from "js-cookie";
 
-Chart.register(...registerables);
+  Chart.register(...registerables);
 
-const props = defineProps<{
-  chartId: string;
-  labelName: string;
-  sensorId?: string;
-  devId: number | string;
-}>();
-const isSensorChartVisible = ref(false);
-const isPropertiesMenuVisible = ref(false);
+  const props = defineProps<{
+    chartId: string;
+    labelName: string;
+    sensorId?: string;
+    devId: number | string;
+  }>();
+  const isSensorChartVisible = ref(false);
+  const isPropertiesMenuVisible = ref(false);
 
-let c: HTMLElement | null = null;
-let ctx: CanvasRenderingContext2D | null = null;
+  let c: HTMLElement | null = null;
+  let ctx: CanvasRenderingContext2D | null = null;
 
-let historyChartData: any = {};
-let newCt: any = {};
-const chartTextShowed = ref(true);
-const chartDataFiltered = ref([] as any[]);
+  let historyChartData: any = {};
+  let newCt: any = {};
+  const chartTextShowed = ref(true);
+  const chartDataFiltered = ref([] as any[]);
 
-function createChart(chartData: any) {
-  if (ctx) {
-    const myChart = new Chart(ctx, {
-      type: chartData.type,
-      data: chartData.data,
-      options: chartData.options,
-    });
-    return myChart;
+  function createChart(chartData: any) {
+    if (ctx) {
+      const myChart = new Chart(ctx, {
+        type: chartData.type,
+        data: chartData.data,
+        options: chartData.options,
+      });
+      return myChart;
+    }
   }
-}
-/*
+  /*
       Data object from emitter is formated like this, or check parrent file for more info:
       {
         slelectedValue: selectmenu.value,
@@ -44,132 +42,128 @@ function createChart(chartData: any) {
         sensorId: props.sensorId
       }
     */
-function createHttpBody(timeMod: HTMLElement | null) {
-  return {
-    deviceId: props.devId,
-    sensorId: props.sensorId,
-    timeModifier: timeMod,
-  };
-}
-async function fetchChartData(body: any) {
-  const authToken = Cookies.get("token");
-  const chartDataRequest = HTTP.post("/iotpp/rest/sensor_service/chart_value", body, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
-  chartDataFiltered.value = [];
-  chartDataRequest
-    .then((response) => {
-      for (let index = 0; index < response.data.length; index += 1) {
-        let dateString = response.data[index].constructedDataPacketDate.slice(0, 19);
-        chartDataFiltered.value.push({
-          x: dateString,
-          y: response.data[index].constructedDataPacketValue,
-        });
+  function createHttpBody(timeMod: HTMLElement | null) {
+    return {
+      deviceId: props.devId,
+      sensorId: props.sensorId,
+      timeModifier: timeMod,
+    };
+  }
+  async function fetchChartData(body: any) {
+    // TODO: Implement restClient here
+    const authToken = Cookies.get("token");
+    const chartDataRequest: any = "";
+    chartDataFiltered.value = [];
+    // chartDataRequest
+    //   .then((response: any) => {
+    //     for (let index = 0; index < response.data.length; index += 1) {
+    //       let dateString = response.data[index].constructedDataPacketDate.slice(0, 19);
+    //       chartDataFiltered.value.push({
+    //         x: dateString,
+    //         y: response.data[index].constructedDataPacketValue,
+    //       });
 
-        dateString = "";
-      }
-    })
-    .then(() => {
-      if (chartDataFiltered.value.length === 0) {
-        chartTextShowed.value = true;
-      } else {
-        chartTextShowed.value = false;
-      }
-      newCt.data.datasets[0].data = chartDataFiltered.value;
-      newCt.update();
-    });
-}
-function selectedTimePeriod() {
-  const selectmenu: HTMLElement | null = document.getElementById(`time-select-${props.sensorId}`);
+    //       dateString = "";
+    //     }
+    //   })
+    //   .then(() => {
+    //     if (chartDataFiltered.value.length === 0) {
+    //       chartTextShowed.value = true;
+    //     } else {
+    //       chartTextShowed.value = false;
+    //     }
+    //     newCt.data.datasets[0].data = chartDataFiltered.value;
+    //     newCt.update();
+    //   });
+  }
+  function selectedTimePeriod() {
+    const selectmenu: HTMLElement | null = document.getElementById(`time-select-${props.sensorId}`);
 
-  const httpBody = createHttpBody(selectmenu);
-  fetchChartData(httpBody);
-}
-function onChartOpen() {
-  // const defaultPeriod = "7 days"
-  // const httpBody = createHttpBody(defaultPeriod)
-  // fetchChartData(httpBody)
-}
+    const httpBody = createHttpBody(selectmenu);
+    fetchChartData(httpBody);
+  }
+  function onChartOpen() {
+    // const defaultPeriod = "7 days"
+    // const httpBody = createHttpBody(defaultPeriod)
+    // fetchChartData(httpBody)
+  }
 
-onMounted(() => {
-  historyChartData = {
-    type: "line",
-    data: {
-      datasets: [
-        {
-          // one line graph
-          label: "",
-          data: [],
-          fill: true,
-          backgroundColor: ["#201b2b"],
-          borderColor: ["#f4efde"],
-          pointBackgroundColor: ["#f4efde"],
-          borderWidth: 1,
-          pointRadius: 1.5,
-          tension: 0.1,
+  onMounted(() => {
+    historyChartData = {
+      type: "line",
+      data: {
+        datasets: [
+          {
+            // one line graph
+            label: "",
+            data: [],
+            fill: true,
+            backgroundColor: ["#201b2b"],
+            borderColor: ["#f4efde"],
+            pointBackgroundColor: ["#f4efde"],
+            borderWidth: 1,
+            pointRadius: 1.5,
+            tension: 0.1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        parsing: true,
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: "week",
+            },
+            display: true,
+            beginAtZero: true,
+            grid: {
+              display: true,
+              color: "#4c4c4c",
+            },
+            ticks: {
+              display: true,
+              color: "#f4efde",
+            },
+          },
+          y: {
+            type: "linear",
+            display: true,
+            beginAtZero: true,
+            grid: {
+              display: true,
+              color: "#4c4c4c",
+            },
+            ticks: {
+              display: true,
+              color: "#f4efde",
+            },
+          },
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      parsing: true,
-      scales: {
-        x: {
-          type: "time",
-          time: {
-            unit: "week",
-          },
-          display: true,
-          beginAtZero: true,
-          grid: {
-            display: true,
-            color: "#4c4c4c",
-          },
-          ticks: {
-            display: true,
-            color: "#f4efde",
-          },
-        },
-        y: {
-          type: "linear",
-          display: true,
-          beginAtZero: true,
-          grid: {
-            display: true,
-            color: "#4c4c4c",
-          },
-          ticks: {
-            display: true,
-            color: "#f4efde",
+        plugins: {
+          legend: {
+            position: "top",
+            align: "end",
+            labels: { color: "#f4efde" },
           },
         },
       },
-      plugins: {
-        legend: {
-          position: "top",
-          align: "end",
-          labels: { color: "#f4efde" },
-        },
-      },
-    },
-  };
+    };
 
-  c = document.getElementById(props.chartId);
-  if (c instanceof HTMLCanvasElement) {
-    ctx = c.getContext("2d");
-    if (ctx) {
-      historyChartData.data.datasets[0].label = props.labelName;
-      newCt = createChart(historyChartData);
+    c = document.getElementById(props.chartId);
+    if (c instanceof HTMLCanvasElement) {
+      ctx = c.getContext("2d");
+      if (ctx) {
+        historyChartData.data.datasets[0].label = props.labelName;
+        newCt = createChart(historyChartData);
+      }
     }
-  }
-  if (ctx !== null) {
-  }
-});
+    if (ctx !== null) {
+    }
+  });
 </script>
 <template>
   <button class="fa fa-bar-chart settings-button" @click="(isSensorChartVisible = true), onChartOpen()"></button>
@@ -210,76 +204,76 @@ onMounted(() => {
   </div>
 </template>
 <style scoped>
-.sensor-chart-wrapper {
-  width: 90%;
-  height: auto;
-  position: fixed;
-  top: 1em;
-  left: 0;
-  margin: 5% 5%;
-  padding: 1rem;
-  background-color: #1d1d1d;
-  z-index: 1004;
-  border-radius: 0.6em;
-}
+  .sensor-chart-wrapper {
+    width: 90%;
+    height: auto;
+    position: fixed;
+    top: 1em;
+    left: 0;
+    margin: 5% 5%;
+    padding: 1rem;
+    background-color: #1d1d1d;
+    z-index: 1004;
+    border-radius: 0.6em;
+  }
 
-.sensor-chart-header {
-  width: 100%;
-  height: 3rem;
-  padding: 0.5em;
-  text-align: center;
-}
+  .sensor-chart-header {
+    width: 100%;
+    height: 3rem;
+    padding: 0.5em;
+    text-align: center;
+  }
 
-.sensor-chart-body {
-  width: 100%;
-  height: 17rem;
-}
+  .sensor-chart-body {
+    width: 100%;
+    height: 17rem;
+  }
 
-.settings-button,
-.close-chart,
-.chart-settings-menu {
-  color: #f4efde;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-  outline: none;
-}
+  .settings-button,
+  .close-chart,
+  .chart-settings-menu {
+    color: #f4efde;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+  }
 
-.chart-item {
-  width: 100% !important;
-  height: 16rem !important;
-  padding: 1em;
-}
+  .chart-item {
+    width: 100% !important;
+    height: 16rem !important;
+    padding: 1em;
+  }
 
-.chart-settings-menu {
-  width: 8%;
-  height: 3rem;
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #505050;
-  border-radius: 0 0.6em 0 0;
-}
+  .chart-settings-menu {
+    width: 8%;
+    height: 3rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #505050;
+    border-radius: 0 0.6em 0 0;
+  }
 
-.chart-settings {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 30%;
-  height: 100%;
-  padding: 1em;
-  border-radius: 0 0.6em 0.6em 0;
-  background-color: #2f2f2f;
-}
+  .chart-settings {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30%;
+    height: 100%;
+    padding: 1em;
+    border-radius: 0 0.6em 0.6em 0;
+    background-color: #2f2f2f;
+  }
 
-.chart-text-top {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  text-align: center;
-  width: 12rem;
-}
+  .chart-text-top {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    text-align: center;
+    width: 12rem;
+  }
 </style>
