@@ -13,10 +13,12 @@ and they send/store their data via another API service on local(private) server.
 
 ## Setup
 
-Donwload the project and firstly run
-`npm install` to fetch the needed packages (check `package.json`)
+Donwload or checkout the project and firstly run
+`npm install` , to fetch the needed packages (check `package.json`)
 
-To build it run `npm build` then move the content of the `dist` folder in the desired static server root directory/subdirectory. 
+To start `DEV` mode run `npm run dev`
+
+To build it run `npm build` , then move the content of the `dist` folder in the desired static server root directory or subdirectory of your choise. 
 
 ### Recommended IDE Setup
 
