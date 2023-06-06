@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import Cookies from "js-cookie";
   import { onMounted, watchEffect, ref, inject } from "vue";
+  import { useRoute } from "vue-router";
   import { emitterKey } from "../globals/emitterKey";
 
   const emitter = inject(emitterKey);
+  const route = useRoute();
   const title = ref("");
 
   const isInfoButtonShown = ref(false);
@@ -18,7 +20,7 @@
   watchEffect(() => {
     const userCookie = Cookies.get("user");
     if (userCookie !== undefined) user = JSON.parse(userCookie);
-    // title.value = route.meta.title;
+    title.value = route.meta.title as string;
 
     emitter?.on("updateInfoButton", (e: boolean) => {
       isInfoButtonShown.value = e;
