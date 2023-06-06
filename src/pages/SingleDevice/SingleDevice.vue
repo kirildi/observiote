@@ -11,7 +11,7 @@
   import Sensor from "../../components/Sensor.vue";
   import { emitterKey } from "../../globals/emitterKey";
   const props = defineProps<{
-    device: any;
+    id: number | string;
   }>();
 
   function createHttpBody(devId: any) {
@@ -37,7 +37,7 @@
   const requestIntervalPeriod = 19000;
 
   function fetchSenorData() {
-    const getSensorsRequest: Promise<OIOTEResponseType> = restClient.updateSensors(props.device.deviceId, storageItem);
+    const getSensorsRequest: Promise<OIOTEResponseType> = restClient.updateSensors(props.id, storageItem);
 
     getSensorsRequest
       .then(() => {
@@ -121,7 +121,7 @@
             </span>
             <div class="">
               <span class="pl-4">
-                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="JSON.stringify(sensor.sensorId)" :dev-id="device.deviceId" />
+                <sensor-history-chart :chart-id="'history-chart-' + sensor.sensorId" :label-name="sensor.sensorTypeId.sensorTypeName" :sensor-id="JSON.stringify(sensor.sensorId)" :dev-id="id" />
               </span>
               <span class="pl-4">
                 <sensor-menu :sensor-id="sensor.sensorId" :sensor-type="sensor.sensorTypeId" />
@@ -147,7 +147,7 @@
       </div>
       <div v-else class="controllers__area col-start-3 col-span-1 row-span-1">
         <div class="actuators-content">
-          <button-control :id="device.deviceId" name="button" />
+          <button-control :id="`${id}-actuator-button`" name="button" />
           <!-- <slider name="slider" /> -->
         </div>
       </div>
