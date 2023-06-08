@@ -19,7 +19,7 @@
     dev?.classList.toggle("w3-hide");
   }
 
-  onMounted(() => {
+  function fetchDevices(): void {
     const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
 
     deviceRequest
@@ -36,21 +36,15 @@
       .catch((err) => {
         globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
       });
+  }
+
+  onMounted(() => {
+    fetchDevices();
   });
   watchEffect(() => {
     fetchDevicesInterval = setInterval(() => {
       if (!deviceList) {
-        const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
-
-        deviceRequest
-          .then((res) => {
-            deviceList = sessionStorage.getItem(storageItem) ?? "";
-            devicesData.value = JSON.parse(deviceList);
-            if (globalAlertStore.triggered) globalAlertStore.removeError();
-          })
-          .catch((err) => {
-            globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
-          });
+        fetchDevices();
       }
     }, requestIntervalPeriod);
   });
