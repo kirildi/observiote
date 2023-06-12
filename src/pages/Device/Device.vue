@@ -18,9 +18,10 @@
     dev?.classList.toggle("w3-hide");
   }
 
+ 
   function obtainDevices(): boolean {
     let runStatus = false;
-
+    
     const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
     deviceRequest
       .then((res) => {
@@ -47,6 +48,7 @@
   watchEffect(() => {
     fetchDevicesInterval = setInterval(() => {
       obtainDevices();
+ 
     }, requestIntervalPeriod);
   });
   onUnmounted(() => {

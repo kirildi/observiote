@@ -18,7 +18,9 @@ Donwload or checkout the project and firstly run
 
 To start `DEV` mode run `npm run dev`
 
-To build it run `npm build` , then move the content of the `dist` folder in the desired static server root directory or subdirectory of your choise. 
+Edit the config values in `.env` with your own. 
+
+To build the project for deployment, run `npm build` , then move the content of the generated `dist` folder, in the desired static server root directory or subdirectory of your choise. 
 
 ### Recommended IDE Setup
 
