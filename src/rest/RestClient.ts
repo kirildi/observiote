@@ -37,7 +37,7 @@ export default class RestClient {
 
           resolve(successType);
         } catch (error: any) {
-          const errorType: OIOTEResponseType = { id: "error", status: error.response.status, statusText: error.response.statusText };
+          const errorType: OIOTEResponseType = { id: "error", status: error.code, statusText: error.message };
           reject(errorType);
         }
       };
@@ -69,7 +69,7 @@ export default class RestClient {
           const successType: OIOTEResponseType = { id: "success", status: response.status, statusText: response.statusText };
           resolve(successType);
         } catch (error: any) {
-          const errorType: OIOTEResponseType = { id: "error", status: error.response.status, statusText: error.response.statusText };
+          const errorType: OIOTEResponseType = { id: "error", status: error.code, statusText: error.message };
           reject(errorType);
         }
       };
@@ -100,7 +100,7 @@ export default class RestClient {
           const successType: OIOTEResponseType = { id: "success", status: response.status, statusText: response.statusText };
           resolve(successType);
         } catch (error: any) {
-          const errorType: OIOTEResponseType = { id: "error", status: error.response.status, statusText: error.response.statusText };
+          const errorType: OIOTEResponseType = { id: "error", status: error.code, statusText: error.message };
           reject(errorType);
         }
       };
