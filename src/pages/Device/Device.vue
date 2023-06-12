@@ -8,8 +8,7 @@
   const globalAlertStore = useAlertsStore();
   const restClient = new RestClient();
 
-  const devicesData = ref([] as any[]);
-  let deviceList: string;
+  let deviceList = ref([] as any[]);
   const storageItem: string = "deviceList";
   let fetchDevicesInterval: NodeJS.Timer;
   const requestIntervalPeriod = 600000; //in milliseconds
@@ -19,33 +18,37 @@
     dev?.classList.toggle("w3-hide");
   }
 
-  function fetchDevices(): void {
+ 
+  function obtainDevices(): boolean {
+    let runStatus = false;
+    
     const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
-
     deviceRequest
       .then((res) => {
-        deviceList = sessionStorage.getItem(storageItem) ?? "";
-        if (!deviceList) {
-          devicesData.value = [];
-          throw { status: "000", statusText: "No stored device data found" };
+        const storedDevices = sessionStorage.getItem(storageItem) ?? "";
+
+        if (!storedDevices) {
+          throw { status: "000", statusText: "No stored devices data found" };
         }
-        devicesData.value = JSON.parse(deviceList);
+        deviceList.value = JSON.parse(storedDevices);
 
         if (globalAlertStore.triggered) globalAlertStore.removeError();
+        runStatus = true;
       })
       .catch((err) => {
         globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+        runStatus = false;
       });
+    return runStatus;
   }
 
   onMounted(() => {
-    fetchDevices();
+    if (!deviceList.value.length) obtainDevices();
   });
   watchEffect(() => {
     fetchDevicesInterval = setInterval(() => {
-      if (!deviceList) {
-        fetchDevices();
-      }
+      obtainDevices();
+ 
     }, requestIntervalPeriod);
   });
   onUnmounted(() => {
@@ -54,13 +57,13 @@
 </script>
 <template>
   <div class="container relative p-4">
-    <div v-if="!devicesData || devicesData.length === 0" class="device-content p-4">
+    <div v-if="!deviceList || deviceList.length === 0" class="device-content p-4">
       <h3>Notice:</h3>
       <p>Devices, should be automatically displayed here. If you read this there should be an error or no connection to the server.</p>
     </div>
     <div v-else class="device-content p-4 grid grid-cols-3 grid-rows-2 grid-flow-col gap-4">
       <ul class="flex flex-auto flex-row gap-4 row=span-2">
-        <li v-for="(device, index) in devicesData" :key="index" class="device-element container">
+        <li v-for="(device, index) in deviceList" :key="index" class="device-element container">
           <div class="w-72 h-64">
             <router-link
               :to="{
