@@ -35,7 +35,7 @@
 <template>
   <!-- NAV -->
   <header id="tab-nav" class="container flex h-16 bg-zinc-800">
-    <div class="w-16 h-16 p-1 text-center">
+    <div class="w-16 h-16 p-1 text-center bg-zinc-700">
       <!-- <div class="w-16 h-8">
         <img src="../../assets/logo.png" alt="img" class="" />
       </div> -->
