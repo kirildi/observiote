@@ -7,7 +7,7 @@ const routes: RouteRecordRaw[] = [
     name: "dashboard",
     props: true,
     meta: { requiresAuth: true, title: "Dashboard" },
-    component: () => import("../pages/Device/Device.vue"),
+    component: () => import("../pages/DeviceList/DeviceList.vue"),
   },
   {
     path: "/login",
@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
     name: "devices",
     props: true,
     meta: { requiresAuth: true, title: "Devices" },
-    component: () => import("../pages/Device/Device.vue"),
+    component: () => import("../pages/DeviceList/DeviceList.vue"),
   },
   {
     path: "/locations",
@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
     name: "device",
     meta: { requiresAuth: true, title: "" },
     props: true,
-    component: () => import("../pages/SingleDevice/SingleDevice.vue"),
+    component: () => import("../pages/Device/Device.vue"),
   },
   {
     path: "/:pathMatch(.*)*",
