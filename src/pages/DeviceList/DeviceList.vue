@@ -1,11 +1,14 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted, ref, watchEffect } from "vue";
   import { useAlertsStore } from "../../stores/globalAlertStore";
+  import { useDeviceStore } from "../../stores/deviceStore";
   import RestClient from "../../rest/RestClient";
   import InteractiveMap from "../../components/maps/InteractiveMap.vue";
   import { OIOTEResponseType } from "../../types/OIOTEResponseType";
 
   const globalAlertStore = useAlertsStore();
+  const deviceStore = useDeviceStore();
+
   const restClient = new RestClient();
 
   let deviceList = ref([] as any[]);
@@ -18,10 +21,9 @@
     dev?.classList.toggle("w3-hide");
   }
 
- 
   function obtainDevices(): boolean {
     let runStatus = false;
-    
+
     const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
     deviceRequest
       .then((res) => {
@@ -31,6 +33,7 @@
           throw { status: "000", statusText: "No stored devices data found" };
         }
         deviceList.value = JSON.parse(storedDevices);
+        deviceStore.updateStore(deviceList.value);
 
         if (globalAlertStore.triggered) globalAlertStore.removeError();
         runStatus = true;
@@ -48,7 +51,6 @@
   watchEffect(() => {
     fetchDevicesInterval = setInterval(() => {
       obtainDevices();
- 
     }, requestIntervalPeriod);
   });
   onUnmounted(() => {

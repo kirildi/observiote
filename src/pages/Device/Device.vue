@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted, inject, ref, watchEffect } from "vue";
   import { useAlertsStore } from "../../stores/globalAlertStore";
+  import { useDeviceStore } from "../../stores/deviceStore";
+
   import RestClient from "../../rest/RestClient";
   import { OIOTEResponseType } from "../../types/OIOTEResponseType";
 
@@ -10,6 +12,7 @@
   import SensorHistoryChart from "../../components/charts/SensorHistoryChart.vue";
   import Sensor from "../../components/Sensor.vue";
   import { emitterKey } from "../../globals/emitterKey";
+
   const props = defineProps<{
     id: number | string;
   }>();
@@ -23,6 +26,8 @@
   const emitter = inject(emitterKey);
 
   const globalAlertStore = useAlertsStore();
+  const deviceStore = useDeviceStore();
+
   const restClient = new RestClient();
 
   const isInfoBoxShown = ref(false);
@@ -56,6 +61,8 @@
 
   onMounted(() => {
     emitter?.emit("updateInfoButton", true);
+
+    infoBoxData.value = deviceStore.read(props.id.toString());
 
     window.document.title = infoBoxData.value.deviceName; // Updates page title
 
