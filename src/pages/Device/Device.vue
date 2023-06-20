@@ -62,7 +62,7 @@
   onMounted(() => {
     emitter?.emit("updateInfoButton", true);
 
-    infoBoxData.value = deviceStore.read(props.id.toString());
+    infoBoxData.value = deviceStore.readByDeviceId(props.id.toString());
 
     window.document.title = infoBoxData.value.deviceName; // Updates page title
 

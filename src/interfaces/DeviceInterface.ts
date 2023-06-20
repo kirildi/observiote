@@ -5,7 +5,7 @@ export interface DeviceInterface {
   deviceHash: string;
   deviceDescription: string;
   deviceCoordinates: string;
-  deviceCrateDate: string;
+  deviceCreateDate: string;
   deviceLastModifyDate: string;
   userName: string;
 }
