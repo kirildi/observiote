@@ -2,47 +2,37 @@
   import { onMounted, onUnmounted, ref, watchEffect } from "vue";
   import { useAlertsStore } from "../../stores/globalAlertStore";
   import { useDeviceStore } from "../../stores/deviceStore";
-  import RestClient from "../../rest/RestClient";
-  import InteractiveMap from "../../components/maps/InteractiveMap.vue";
+  import { DeviceInterface } from "../../interfaces/DeviceInterface";
   import { OIOTEResponseType } from "../../types/OIOTEResponseType";
+  import InteractiveMap from "../../components/maps/InteractiveMap.vue";
 
   const globalAlertStore = useAlertsStore();
   const deviceStore = useDeviceStore();
 
-  const restClient = new RestClient();
+  let deviceList = ref([] as DeviceInterface[]);
 
-  let deviceList = ref([] as any[]);
-  const storageItem: string = "deviceList";
   let fetchDevicesInterval: NodeJS.Timer;
   const requestIntervalPeriod = 600000; //in milliseconds
 
-  function toggleElementInfo(tempId: Number) {
+  function toggleElementInfo(tempId: number | string) {
     const dev: Element | null = document.querySelector(`.device-${tempId}-info-content`);
     dev?.classList.toggle("w3-hide");
   }
 
-  function obtainDevices(): boolean {
-    let runStatus = false;
+  async function obtainDevices(): Promise<boolean> {
+    let deviceFetch: Promise<OIOTEResponseType> = deviceStore.fetch();
 
-    const deviceRequest: Promise<OIOTEResponseType> = restClient.fetchDevices(storageItem);
-    deviceRequest
-      .then((res) => {
-        const storedDevices = sessionStorage.getItem(storageItem) ?? "";
-
-        if (!storedDevices) {
-          throw { status: "000", statusText: "No stored devices data found" };
-        }
-        deviceList.value = JSON.parse(storedDevices);
-        deviceStore.updateStore(deviceList.value);
-
+    return deviceFetch
+      .then(() => {
+        deviceList.value = deviceStore.deviceList;
         if (globalAlertStore.triggered) globalAlertStore.removeError();
-        runStatus = true;
+
+        return Promise.resolve(true);
       })
-      .catch((err) => {
+      .catch((err: OIOTEResponseType) => {
         globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
-        runStatus = false;
+        return Promise.reject(false);
       });
-    return runStatus;
   }
 
   onMounted(() => {
