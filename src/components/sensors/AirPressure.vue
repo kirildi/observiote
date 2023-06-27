@@ -1,112 +1,80 @@
 <script setup lang="ts">
-  import { onMounted, ref, watchEffect } from "vue";
+  import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
   import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
-    id: number;
+    id: number | string;
     type: string;
-    data: any[];
+    data: SensorDataValue[];
   }>();
-  const isType = ref("basic");
-  const dataNow = ref("");
-  let gaugeFill: HTMLElement | null = null;
 
-  function updateGauge(fill: HTMLElement | null) {
-    if (!fill) return;
-    const converted = parseInt(dataNow.value, 10);
-    const value = converted / 20;
-    fill.style.transform = `rotate(${value}turn)`;
+  const isType = ref("basic");
+  const dataNow: Ref<SensorDataValue[]> = ref([]);
+  let gaugeFill = ref<HTMLElement | null>(null);
+  const minAirPressure = 0;
+  const maxAirPressure = 1020; // theoretical max hPa value on Earth
+  const minGaugeAngle = 0; // in degree
+  const maxGaugeAngle = 180; // in degree
+
+  function mapValueToDegree(airPressure: number, maxAirPressure: number, minAirPressure: number, maxGaugeAngle: number, minGaugeAngle: number): number {
+    return ((airPressure - minAirPressure) * (maxGaugeAngle - minGaugeAngle)) / (maxAirPressure - minAirPressure) + minGaugeAngle;
+  }
+  function updateGauge(): void {
+    if (!gaugeFill.value) return;
+    if (dataNow.value[0].now === undefined) return;
+
+    const value = mapValueToDegree(dataNow.value[0].now, maxAirPressure, minAirPressure, maxGaugeAngle, minGaugeAngle);
+    gaugeFill.value.style.transform = `rotate(${value}deg)`;
+  }
+
+  function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
+    return dataObj;
   }
 
   onMounted(() => {
-    isType.value = props.type;
-    for (let i = 0; i < props.data.length; i += 1) {
-      if (props.data[i].sensorId.sensorId === props.id) {
-        dataNow.value = props.data[i].sensorData;
-        break;
-      }
-    }
-    gaugeFill = document.querySelector<HTMLElement>(".pressure-gauge-fill");
-    updateGauge(gaugeFill);
+    gaugeFill.value = document.querySelector(".pressure__gauge__fill");
   });
-  watchEffect(() => {
-    gaugeFill = document.querySelector<HTMLElement>(".pressure-gauge-fill");
-    updateGauge(gaugeFill);
 
-    for (let i = 0; i < props.data.length; i += 1) {
-      if (props.data[i].sensorId.sensorId === props.id) {
-        dataNow.value = props.data[i].sensorData;
-        break;
-      }
-    }
+  watchEffect(() => {
+    isType.value = props.type;
+    dataNow.value = verifySensorData(props.data);
+
+    updateGauge();
   });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="air-pressure-container">
-    <default-sensor :id="'basic_' + id" :default-data="dataNow" />
+  <div v-if="isType === 'basic'" class="air__pressure__container max-w-xs p-4">
+    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
   </div>
-  <div v-else class="air-pressure-container">
-    <div class="pressure-gauge-body">
-      <div class="pressure-gauge-fill"></div>
-      <div class="pressure-gauge-cover">
-        <div class="pressure-value">{{ dataNow }} bar</div>
+  <div v-else class="air__pressure__container max-w-xs p-4">
+    <div class="pressure__gauge__body relative w-full pb-24 bg-gray-600 overflow-hidden">
+      <div id="asd" class="pressure__gauge__fill absolute top-full left-0 w-full h-full bg-orange-600"></div>
+      <div class="pressure__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
+        <div class="pressure__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} bar</div>
       </div>
     </div>
   </div>
 </template>
 <style scoped>
-  .air-pressure-container {
-    width: 100%;
-    max-width: 250px;
-    padding: 1em;
-  }
-  .pressure-gauge-body {
-    width: 100%;
-    height: 0;
-    padding-bottom: 50%;
-    background: #606060;
-    position: relative;
+  .pressure__gauge__body {
     border-top-left-radius: 100% 200%;
     border-top-right-radius: 100% 200%;
-    overflow: hidden;
   }
-  .pressure-gauge-cover {
-    width: 75%;
-    height: 150%;
-    background: #353839;
-    border-radius: 50%;
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translateX(-50%);
-    /* Text */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 25%;
-    box-sizing: border-box;
-  }
-  .pressure-gauge-fill {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: inherit;
-    height: 100%;
-    background: #cc6f00;
+
+  .pressure__gauge__fill {
     transform-origin: center top;
     transform: rotate(0);
     transition: transform 0.2s ease-out;
   }
+  .pressure__gauge__cover {
+    background: #353839;
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+
   .pressure-value {
-    color: rgba(255, 255, 255, 1);
-    font-size: 1.2em;
-    position: absolute;
-    width: auto;
-    height: 100%;
-    top: 2em;
-    margin-left: auto;
-    margin-right: auto;
     transition: all 1s ease-out;
   }
 </style>
