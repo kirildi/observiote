@@ -1,113 +1,68 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
-import DefaultSensor from "./DefaultSensor.vue";
+  import { Ref, onMounted, ref, watchEffect } from "vue";
+  import { SensorDataValue } from "../../types/SensorDataType";
+  import DefaultSensor from "./DefaultSensor.vue";
 
-const props = defineProps<{
-  id: number;
-  type: string;
-  data: any[];
-}>();
-const isType = ref("basic");
-const dataNow = ref("");
-let gaugeFill: HTMLElement | null = null;
+  const props = defineProps<{
+    id: number | string;
+    type: string;
+    data: SensorDataValue[];
+  }>();
+  const isType = ref("basic");
+  const dataNow: Ref<SensorDataValue[]> = ref([]);
+  let gaugeFill = ref<HTMLElement | null>(null);
 
-function updateGauge(fill: HTMLElement | null) {
-  if (!fill) return;
-  const converted = parseInt(dataNow.value, 10);
-  // (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-  const value = (converted * 0.5) / 100;
-  fill.style.transform = `rotate(${value}turn)`;
-}
+  function updateGauge() {
+    if (!gaugeFill.value) return;
+    if (dataNow.value[0].now === undefined) return;
 
-onMounted(() => {
-  isType.value = props.type;
-
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+    const value = (dataNow.value[0].now * 0.5) / 100;
+    gaugeFill.value.style.transform = `rotate(${value}deg)`;
   }
-  gaugeFill = document.querySelector<HTMLElement>(".humidity-gauge-fill");
-  updateGauge(gaugeFill);
-});
-watchEffect(() => {
-  gaugeFill = document.querySelector<HTMLElement>(".humidity-gauge-fill");
-  updateGauge(gaugeFill);
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+
+  function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
+    return dataObj;
   }
-});
+  onMounted(() => {
+    gaugeFill.value = document.querySelector(".humidity-gauge-fill");
+  });
+  watchEffect(() => {
+    isType.value = props.type;
+    dataNow.value = verifySensorData(props.data);
+  });
 </script>
 <template>
   <div v-if="isType === 'basic'" class="humidity-container">
-    <default-sensor :id="'basic_' + id" :default-data="dataNow" />
+    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
   </div>
-  <div v-else class="humidity-container">
-    <div class="humidity-gauge-body">
-      <div class="humidity-gauge-fill"></div>
-      <div class="humidity-gauge-cover">
-        <div class="humidity-value">{{ dataNow }}%</div>
+  <div v-else class="humidity__container max-w-xs p-4">
+    <div class="humidity__gauge__body relative w-full pb-24 bg-neutral-600 overflow-hidden">
+      <div class="humidity__gauge__fill absolute top-full left-0 w-full h-full bg-blue-600"></div>
+      <div class="humidity__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
+        <div class="humidity__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} %</div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.humidity-container {
-  width: 100%;
-  max-width: 250px;
-  padding: 1em;
-}
-.humidity-gauge-body {
-  width: 100%;
-  height: 0;
-  padding-bottom: 50%;
-  background: #606060;
-  position: relative;
-  border-top-left-radius: 100% 200%;
-  border-top-right-radius: 100% 200%;
-  overflow: hidden;
-}
-.humidity-gauge-cover {
-  width: 75%;
-  height: 150%;
-  background: #353839;
-  border-radius: 50%;
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translateX(-50%);
-  /* Text */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 25%;
-  box-sizing: border-box;
-}
-.humidity-gauge-fill {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: inherit;
-  height: 100%;
-  background: #0266a8;
-  transform-origin: center top;
-  transform: rotate(0);
-  transition: transform 0.2s ease-out;
-}
-.humidity-value {
-  color: rgba(255, 255, 255, 1);
-  font-size: 1.2em;
-  position: absolute;
-  width: auto;
-  height: 100%;
-  top: 2em;
-  margin-left: auto;
-  margin-right: auto;
-  transition: all 1s ease-out;
-}
+  .humidity__gauge__body {
+    border-top-left-radius: 100% 200%;
+    border-top-right-radius: 100% 200%;
+  }
+
+  .humidity__gauge__cover {
+    background: #353839;
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+  .humidity__gauge__fill {
+    transform-origin: center top;
+    transform: rotate(0);
+    transition: transform 0.2s ease-out;
+  }
+  .humidity-value {
+    transition: all 1s ease-out;
+  }
 </style>
