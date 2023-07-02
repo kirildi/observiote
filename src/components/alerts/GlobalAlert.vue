@@ -21,7 +21,7 @@
       alertProps.alertHeader = "WARNING: ";
       alertProps.alertColor = "alert-warning";
     }
-    alertProps.alertCode = store.alertCode;
+    alertProps.alertCode = store.alertCode.toString();
     alertProps.alertMessage = store.alertMessage;
   }
   watchEffect(() => {
