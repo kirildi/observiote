@@ -15,15 +15,21 @@
   const c = ref<HTMLElement | null>(null);
   let ctx: CanvasRenderingContext2D | null = null;
 
+  const minAirPressure = 600;
+  const maxAirPressure = 1100;
+
+  const pointerMinX = 14;
+  const pointerMaxX = 222;
+
   function drawScale(ctx_: CanvasRenderingContext2D | null) {
     if (!ctx_) return;
-    ctx_.lineWidth = 2;
+    ctx_.lineWidth = 3;
     ctx_.strokeStyle = "palegreen";
     ctx_.beginPath();
     ctx_.moveTo(36, 50);
     ctx_.lineTo(12, 36);
     ctx_.bezierCurveTo(80, 6, 160, 6, 226, 36);
-    ctx_.lineTo(208, 50);
+    ctx_.lineTo(202, 49);
     ctx_.stroke();
   }
 
@@ -36,14 +42,32 @@
     ctx_.fill();
   }
 
-  function drawPointer(ctx_: CanvasRenderingContext2D | null) {
+  function drawPointer(ctx_: CanvasRenderingContext2D | null, dataValue?: number) {
     if (!ctx_) return;
+
+    let dataValueTemporary = minAirPressure;
+    if (dataValue) dataValueTemporary = dataValue;
+
+    const pointerXCalculated = convertDataToScale(dataValueTemporary, pointerMinX, pointerMaxX);
+
     ctx_.lineWidth = 3;
     ctx_.strokeStyle = "tomato";
     ctx_.beginPath();
     ctx_.moveTo(120, 96);
-    ctx_.lineTo(14, 38);
+    ctx_.lineTo(pointerXCalculated, 38);
     ctx_.stroke();
+  }
+
+  function drawValue(ctx_: CanvasRenderingContext2D | null, dataValue?: number) {
+    if (!ctx_) return;
+
+    let dataValueString = 0;
+    if (dataValue !== undefined) dataValueString = dataValue;
+
+    ctx_.fillStyle = "darkgray";
+    ctx_.textAlign = "center";
+    ctx_.font = "1.5rem sans-serif ";
+    ctx_.fillText(`${dataValueString} bar`, 120, 60);
   }
 
   function drawBackground(ctx_: CanvasRenderingContext2D | null) {
@@ -55,7 +79,14 @@
     ctx_.fillRect(0, 0, 240, 100);
   }
 
-  function updatePointer(dataValue: number) {}
+  function updatePointer(dataValue: number) {
+    drawPointer(ctx, dataValue);
+    drawValue(ctx, dataValue);
+  }
+  function convertDataToScale(dataValue: number, pointerMinX: number, pointerMaxX: number): number {
+    return ((dataValue - minAirPressure) * (pointerMaxX - pointerMinX)) / (maxAirPressure - minAirPressure) + pointerMinX;
+  }
+
   function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
     if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
     return dataObj;
@@ -67,10 +98,11 @@
       ctx = c.value.getContext("2d");
 
       if (ctx) {
-        drawBackground(ctx);
+        // drawBackground(ctx);
         drawScale(ctx);
         drawPointer(ctx);
         drawCover(ctx);
+        drawValue(ctx);
       }
     }
   });
@@ -78,7 +110,7 @@
     isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
 
-    updatePointer(dataNow.value[0].now ?? 90);
+    updatePointer(dataNow.value[0].now ?? minAirPressure);
   });
 </script>
 
