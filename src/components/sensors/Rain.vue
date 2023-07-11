@@ -1,88 +1,59 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
-import DefaultSensor from "./DefaultSensor.vue";
+  import { Ref, onMounted, ref, watchEffect } from "vue";
+  import { SensorDataValue } from "../../types/SensorDataType";
+  import DefaultSensor from "./DefaultSensor.vue";
 
-const props = defineProps<{
-  id: number;
-  type: string;
-  data: any[];
-}>();
-const isType = ref("basic");
-const dataNow = ref("");
+  const props = defineProps<{
+    id: number | string;
+    type: string;
+    data: SensorDataValue[];
+  }>();
+  const isType = ref("basic");
+  const dataNow: Ref<SensorDataValue[]> = ref([]);
+  let rainLevelElement = ref<HTMLElement | null>(null);
 
-onMounted(() => {
-  isType.value = props.type;
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+  const minScale = 0;
+  const maxScale = 5;
+
+  function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
+    return dataObj;
   }
-});
-watchEffect(() => {
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+  function convertDataToScale(dataInput: number): number {
+    if (dataInput === 0) return 0;
+    if (dataInput < maxScale) return dataInput;
+
+    return maxScale;
   }
-});
+  function rainLevelFill() {
+    if (!rainLevelElement.value) return;
+    if (dataNow.value[0].now === undefined) return;
+
+    const convertedScale = convertDataToScale(dataNow.value[0].now).toString();
+
+    rainLevelElement.value.style.height = `${convertedScale}em`;
+  }
+  onMounted(() => {
+    rainLevelElement.value = document.querySelector(".level");
+    rainLevelFill();
+  });
+
+  watchEffect(() => {
+    isType.value = props.type;
+    dataNow.value = verifySensorData(props.data);
+  });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="rain-container">
-    <default-sensor :id="'basic_' + id" :default-data="dataNow" />
+  <div v-if="isType === 'basic'" class="rain__container">
+    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
   </div>
-  <div v-else class="rain-container">
-    <div class="container">
-      <div class="outer">
-        <div class="rain-value">{{ dataNow }} mm</div>
-        <div id="rain-level" class="level"></div>
-      </div>
+  <div v-else class="rain__container w-full h-full">
+    <div class="relative flex flex-row justify-center items-center">
+      <div class="outer w-60 h-24 p-2 mt-1 rounded-b-2xl border-solid border-2 border-t-0 border-x-white"></div>
+      <div id="rain-level" class="level absolute bottom-2 w-56 bg-blue-600 rounded-b-2xl"></div>
+      <div class="rain__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }} mm</div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.rain-container {
-  width: 100%;
-  height: 100%;
-  padding: 1em;
-}
-.container {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-}
-
-.outer {
-  border-radius: 0 0 1em 1em;
-  border-top: 0 solid #000;
-  border-bottom: 3px solid #f4efde;
-  border-right: 3px solid #f4efde;
-  border-left: 3px solid #f4efde;
-  padding: 3px;
-  width: 200px;
-  height: 100%;
-}
-
-.level {
-  border-radius: 0 0 0.6em 0.6em;
-  background-color: #0c6680;
-  height: 90px;
-}
-
-.rain-value {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  font-size: 1.4em;
-  top: 36%;
-}
-</style>
+<style scoped></style>
