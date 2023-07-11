@@ -41,6 +41,7 @@
   watchEffect(() => {
     isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
+    rainLevelFill();
   });
 </script>
 <template>
