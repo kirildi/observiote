@@ -20,7 +20,7 @@
 <template>
   <air-pressure v-if="content.sensorTypeId.sensorTypeName === 'Air_Pressure'" :id="content.sensorId" type="advanced" :data="data" />
   <barometer v-if="content.sensorTypeId.sensorTypeName === 'Barometer'" :id="content.sensorId" type="advanced" :data="data" />
-  <battery-level v-if="content.sensorTypeId.sensorTypeName === 'Battery'" :id="content.sensorId" type="advanced" :data="data" />
+  <battery-level v-if="content.sensorTypeId.sensorTypeName === 'BatteryLevel'" :id="content.sensorId" type="advanced" :data="data" />
   <date-time v-if="content.sensorTypeId.sensorTypeName === 'DateTime'" :id="content.sensorId" type="basic" :data="data" />
   <humidity v-if="content.sensorTypeId.sensorTypeName === 'Humidity'" :id="content.sensorId" type="advanced" :data="data" />
   <rain v-if="content.sensorTypeId.sensorTypeName === 'Rain'" :id="content.sensorId" type="advanced" :data="data" />

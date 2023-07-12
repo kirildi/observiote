@@ -1,94 +1,62 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
-import DefaultSensor from "./DefaultSensor.vue";
+  import { Ref, onMounted, ref, watchEffect } from "vue";
+  import { SensorDataValue } from "../../types/SensorDataType";
+  import DefaultSensor from "./DefaultSensor.vue";
 
-const props = defineProps<{
-  id: number;
-  type: string;
-  data: any[];
-}>();
-const isType = ref("basic");
-const dataNow = ref("");
+  const props = defineProps<{
+    id: number | string;
 
-onMounted(() => {
-  isType.value = props.type;
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+    type: string;
+    data: SensorDataValue[];
+  }>();
+  const isType = ref("basic");
+  const dataNow: Ref<SensorDataValue[]> = ref([]);
+  let batteryLevelElement = ref<HTMLElement | null>(null);
+
+  const minScale = 0;
+  const maxScale = 12;
+  const maxValue = 100;
+
+  function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
+    return dataObj;
   }
-});
-watchEffect(() => {
-  for (let i = 0; i < props.data.length; i += 1) {
-    if (props.data[i].sensorId.sensorId === props.id) {
-      dataNow.value = props.data[i].sensorData;
-      break;
-    }
+  function convertDataToScale(dataInput: number): number {
+    if (dataInput === 0) return 0;
+
+    return (dataInput * maxScale) / maxValue;
   }
-});
+  function batteryLevelFill() {
+    if (!batteryLevelElement.value) return;
+    if (dataNow.value[0].now === undefined) return;
+
+    const convertedScale = convertDataToScale(dataNow.value[0].now).toString();
+    batteryLevelElement.value.style.width = `${convertedScale}rem`;
+  }
+
+  onMounted(() => {
+    batteryLevelElement.value = document.querySelector(".battery__level");
+    batteryLevelFill();
+  });
+  watchEffect(() => {
+    isType.value = props.type;
+    dataNow.value = verifySensorData(props.data);
+    batteryLevelFill();
+  });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="battery-container">
-    <default-sensor :id="'basic_' + id" :default-data="dataNow" />
+  <div v-if="isType === 'basic'" class="battery__container w-full h-full">
+    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
   </div>
-  <div v-else class="battery-container">
-    <div class="container">
-      <div class="outer">
-        <div class="battery-value">50%</div>
-        <div id="battery-level" class="level"></div>
-      </div>
-      <div class="battery-plus"></div>
+  <div v-else class="battery__container w-full h-full">
+    <div class="container relative flex flex-row justify-center items-center">
+      <div class="outer w-60 h-24 p-2 border-solid border-2 rounded-xl border-white"></div>
+      <div id="battery-level" class="battery__level absolute left-3 h-20 rounded-xl bg-lime-600"></div>
+      <div class="battery__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }}%</div>
+
+      <div class="battery__cathode rounded-2xl m-2 w-2 h-8 bg-white"></div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.battery-container {
-  width: 100%;
-  height: 100%;
-  padding: 1em;
-}
-.container {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-}
-
-.outer {
-  border-radius: 1em;
-  border: 3px solid #f4efde;
-  padding: 3px;
-  width: 200px;
-  height: 100%;
-}
-
-.battery-plus {
-  border-radius: 1em;
-  background-color: #f4efde;
-  margin: 5px;
-  width: 8px;
-  height: 50px;
-}
-
-.level {
-  border-radius: 0.6em;
-  background-color: #669b1b;
-  height: 90px;
-}
-
-.battery-value {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  font-size: 1.4em;
-  top: 36%;
-}
-</style>
+<style scoped></style>
