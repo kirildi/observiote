@@ -1,15 +1,13 @@
 <script setup lang="ts">
   import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
-  import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
     id: number | string;
-    type: string;
+    type?: string;
     data: SensorDataValue[];
   }>();
 
-  const isType = ref("basic");
   const dataNow: Ref<SensorDataValue[]> = ref([]);
   let gaugeFill = ref<HTMLElement | null>(null);
   const minAirPressure = 0;
@@ -38,17 +36,13 @@
   });
 
   watchEffect(() => {
-    isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
 
     updateGauge();
   });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="air__pressure__container max-w-xs p-4">
-    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
-  </div>
-  <div v-else class="air__pressure__container max-w-xs p-4">
+  <div class="air__pressure__container">
     <div class="pressure__gauge__body relative w-full pb-24 bg-gray-600 overflow-hidden">
       <div id="asd" class="pressure__gauge__fill absolute top-full left-0 w-full h-full bg-orange-600"></div>
       <div class="pressure__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
