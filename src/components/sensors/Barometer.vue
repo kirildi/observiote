@@ -1,16 +1,13 @@
 <script setup lang="ts">
   import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
-  import colors from "tailwindcss/colors";
-
-  import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
     id: number | string;
-    type: string;
+    type?: string;
     data: SensorDataValue[];
   }>();
-  const isType = ref("basic");
+
   const dataNow: Ref<SensorDataValue[]> = ref([]);
   const c = ref<HTMLElement | null>(null);
   let ctx: CanvasRenderingContext2D | null = null;
@@ -107,7 +104,6 @@
     }
   });
   watchEffect(() => {
-    isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
 
     updatePointer(dataNow.value[0].now ?? minAirPressure);
@@ -115,13 +111,8 @@
 </script>
 
 <template>
-  <div v-if="isType === 'basic'" class="air__pressure__container max-w-xs">
-    <default-sensor :id="'therm_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
-  </div>
-  <div v-else class="air__pressure__container max-w-xs">
-    <div class="gauge__container relative w-full flex justify-center items-center">
-      <canvas :id="`barometer__${id}`" width="240" height="100"></canvas>
-    </div>
+  <div class="gauge__container relative w-full flex justify-center items-center">
+    <canvas :id="`barometer__${id}`" width="240" height="100"></canvas>
   </div>
 </template>
 
