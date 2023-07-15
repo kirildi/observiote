@@ -1,14 +1,13 @@
 <script setup lang="ts">
   import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
-  import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
     id: number | string;
-    type: string;
+    type?: string;
     data: SensorDataValue[];
   }>();
-  const isType = ref("basic");
+
   const dataNow: Ref<SensorDataValue[]> = ref([]);
   let gaugeFill = ref<HTMLElement | null>(null);
 
@@ -28,20 +27,15 @@
     gaugeFill.value = document.querySelector(".humidity-gauge-fill");
   });
   watchEffect(() => {
-    isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
+    updateGauge();
   });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="humidity-container">
-    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
-  </div>
-  <div v-else class="humidity__container max-w-xs p-4">
-    <div class="humidity__gauge__body relative w-full pb-24 bg-neutral-600 overflow-hidden">
-      <div class="humidity__gauge__fill absolute top-full left-0 w-full h-full bg-blue-600"></div>
-      <div class="humidity__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
-        <div class="humidity__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} %</div>
-      </div>
+  <div class="humidity__gauge__body relative w-full pb-24 bg-neutral-600 overflow-hidden">
+    <div class="humidity__gauge__fill absolute top-full left-0 w-full h-full bg-blue-600"></div>
+    <div class="humidity__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
+      <div class="humidity__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} %</div>
     </div>
   </div>
 </template>

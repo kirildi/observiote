@@ -1,14 +1,13 @@
 <script setup lang="ts">
   import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
-  import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
     id: number | string;
-    type: string;
+    type?: string;
     data: SensorDataValue[];
   }>();
-  const isType = ref("basic");
+
   const dataNow: Ref<SensorDataValue[]> = ref([]);
   let rainLevelElement = ref<HTMLElement | null>(null);
 
@@ -39,21 +38,15 @@
   });
 
   watchEffect(() => {
-    isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
     rainLevelFill();
   });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="rain__container">
-    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
-  </div>
-  <div v-else class="rain__container w-full h-full">
-    <div class="relative flex flex-row justify-center items-center">
-      <div class="outer w-60 h-24 p-2 mt-1 rounded-b-2xl border-solid border-2 border-t-0 border-x-white"></div>
-      <div id="rain-level" class="level absolute bottom-2 w-56 bg-blue-600 rounded-b-2xl"></div>
-      <div class="rain__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }} mm</div>
-    </div>
+  <div class="rain__container relative flex flex-row justify-center items-center">
+    <div class="outer w-60 h-24 p-2 rounded-b-2xl border-solid border-2 border-t-0 border-x-white"></div>
+    <div id="rain-level" class="level absolute bottom-2 w-56 bg-blue-600 rounded-b-2xl"></div>
+    <div class="rain__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }} mm</div>
   </div>
 </template>
 

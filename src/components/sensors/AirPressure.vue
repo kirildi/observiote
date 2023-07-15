@@ -42,12 +42,10 @@
   });
 </script>
 <template>
-  <div class="air__pressure__container">
-    <div class="pressure__gauge__body relative w-full pb-24 bg-gray-600 overflow-hidden">
-      <div id="asd" class="pressure__gauge__fill absolute top-full left-0 w-full h-full bg-orange-600"></div>
-      <div class="pressure__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
-        <div class="pressure__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} bar</div>
-      </div>
+  <div class="pressure__gauge__body relative w-full pb-24 bg-gray-600 overflow-hidden">
+    <div id="asd" class="pressure__gauge__fill absolute top-full left-0 w-full h-full bg-orange-600"></div>
+    <div class="pressure__gauge__cover absolute flex w-3/4 h-full top-1/4 left-1/2 pb-36 justify-center items-center box-border">
+      <div class="pressure__value absolute top-8 w-auto h-full mx-auto text-white text-xl">{{ dataNow[0]?.now ?? 0 }} bar</div>
     </div>
   </div>
 </template>

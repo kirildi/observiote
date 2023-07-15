@@ -1,15 +1,13 @@
 <script setup lang="ts">
   import { Ref, onMounted, ref, watchEffect } from "vue";
   import { SensorDataValue } from "../../types/SensorDataType";
-  import DefaultSensor from "./DefaultSensor.vue";
 
   const props = defineProps<{
     id: number | string;
-
-    type: string;
+    type?: string;
     data: SensorDataValue[];
   }>();
-  const isType = ref("basic");
+
   const dataNow: Ref<SensorDataValue[]> = ref([]);
   let batteryLevelElement = ref<HTMLElement | null>(null);
 
@@ -39,23 +37,17 @@
     batteryLevelFill();
   });
   watchEffect(() => {
-    isType.value = props.type;
     dataNow.value = verifySensorData(props.data);
     batteryLevelFill();
   });
 </script>
 <template>
-  <div v-if="isType === 'basic'" class="battery__container w-full h-full">
-    <default-sensor :id="'basic_' + id" :default-data="`${dataNow[0]?.now ?? 0}`" />
-  </div>
-  <div v-else class="battery__container w-full h-full">
-    <div class="container relative flex flex-row justify-center items-center">
-      <div class="outer w-60 h-24 p-2 border-solid border-2 rounded-xl border-white"></div>
-      <div id="battery-level" class="battery__level absolute left-3 h-20 rounded-xl bg-lime-600"></div>
-      <div class="battery__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }}%</div>
+  <div class="battery__container relative flex flex-row justify-center items-center">
+    <div class="outer w-60 h-24 p-2 border-solid border-2 rounded-xl border-white"></div>
+    <div id="battery-level" class="battery__level absolute left-3 h-20 rounded-xl bg-lime-600"></div>
+    <div class="battery__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }}%</div>
 
-      <div class="battery__cathode rounded-2xl m-2 w-2 h-8 bg-white"></div>
-    </div>
+    <div class="battery__cathode rounded-2xl m-2 w-2 h-8 bg-white"></div>
   </div>
 </template>
 
