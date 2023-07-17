@@ -121,7 +121,7 @@
         <p>NOTICE: Device content is updated automatically.</p>
       </div>
       <div v-else class="sensors__area row-span-2 col-span-2 col-start-1 flex flex-row flex-wrap gap-8 basis-60">
-        <div v-for="sensor in sensorList" :key="sensor.sensorId" class="sensor__cell h-40 p-4 bg-zinc-700 rounded-xl">
+        <div v-for="sensor in sensorList" :key="sensor.sensorId" class="sensor__cell h-44 p-4 bg-zinc-700 rounded-xl">
           <div class="sensor__header w-60 h-8 flex flex-row flex-auto place-content-between">
             <span class=" ">
               {{ sensor.sensorTypeId.sensorTypeName }}

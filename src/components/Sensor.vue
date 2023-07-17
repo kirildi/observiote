@@ -28,7 +28,7 @@
 
 <template>
   <div v-if="isType === 'basic'" class="max-w-xs p-4">
-    <default-sensor :id="'basic_' + id" :default-data="`${data[0]?.now ?? 0}`" />
+    <default-sensor :id="'basic_' + id" :data="data" />
   </div>
   <div v-else class="max-w-xs p-4">
     <air-pressure v-if="content.sensorTypeId.sensorTypeName === 'AirPressure'" :id="content.sensorId" type="advanced" :data="data" />
