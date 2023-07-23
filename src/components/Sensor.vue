@@ -37,7 +37,7 @@
     <date-time v-if="content.sensorTypeId.sensorTypeName === 'DateTime'" :id="content.sensorId" type="basic" :data="data" />
     <humidity v-if="content.sensorTypeId.sensorTypeName === 'Humidity'" :id="content.sensorId" type="advanced" :data="data" />
     <rain v-if="content.sensorTypeId.sensorTypeName === 'Rain'" :id="content.sensorId" type="advanced" :data="data" />
-    <sun-light v-if="content.sensorTypeId.sensorTypeName === 'Sun Light'" :id="content.sensorId" type="basic" :data="data" />
+    <sun-light v-if="content.sensorTypeId.sensorTypeName === 'SunLight'" :id="content.sensorId" type="advanced" :data="data" />
     <thermometer v-if="content.sensorTypeId.sensorTypeName === 'Temperature'" :id="content.sensorId" type="advanced" :data="data" />
     <water-level v-if="content.sensorTypeId.sensorTypeName === 'WaterLevel'" :id="content.sensorId" type="advanced" :data="data" />
   </div>

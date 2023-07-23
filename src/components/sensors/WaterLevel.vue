@@ -70,7 +70,7 @@
   }
 
   function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
-    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 60 }];
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0 }];
     return dataObj;
   }
   onMounted(() => {
