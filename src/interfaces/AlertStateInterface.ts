@@ -1,6 +1,6 @@
 export interface AlertStateInterface {
   triggered?: boolean;
-  alertType: string;
+  alertType?: string;
   alertCode: string | number;
   alertMessage: string;
 }
