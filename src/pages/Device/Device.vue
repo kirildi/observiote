@@ -51,11 +51,11 @@
           throw { status: "000", statusText: "No stored sensors data found" };
         } else {
           sensorList.value = JSON.parse(storedSensors);
-          if (globalAlertStore.triggered) globalAlertStore.removeError();
+          if (globalAlertStore.triggered) globalAlertStore.clearAlert();
         }
       })
       .catch((err) => {
-        globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+        globalAlertStore.setError({ alertCode: err.status, alertMessage: err.statusText });
       });
   }
 

@@ -25,12 +25,12 @@
     return deviceFetch
       .then(() => {
         deviceList.value = deviceStore.deviceList;
-        if (globalAlertStore.triggered) globalAlertStore.removeError();
+        if (globalAlertStore.triggered) globalAlertStore.clearAlert();
 
         return Promise.resolve(true);
       })
       .catch((err: OIOTEResponseType) => {
-        globalAlertStore.setError({ alertType: "ERROR", alertCode: err.status, alertMessage: err.statusText });
+        globalAlertStore.setError({ alertCode: err.status, alertMessage: err.statusText });
         return Promise.reject(false);
       });
   }
