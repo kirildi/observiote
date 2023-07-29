@@ -3,4 +3,5 @@ export type SensorDataValue = {
   max?: number;
   now?: number;
   scale?: number;
+  stringVal?: string;
 };

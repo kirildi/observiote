@@ -1,37 +1,25 @@
 <script setup lang="ts">
-  import { onMounted, ref, watchEffect } from "vue";
+  import { Ref, onMounted, ref, watchEffect } from "vue";
+  import { SensorDataValue } from "../../types/SensorDataType";
 
   const props = defineProps<{
-    id: number;
+    id: number | string;
     type?: string;
-    data: any[];
+    data: SensorDataValue[];
   }>();
-
-  const dataNow = ref("");
-
-  onMounted(() => {
-    for (let i = 0; i < props.data.length; i += 1) {
-      if (props.data[i].sensorId.sensorId === props.id) {
-        dataNow.value = props.data[i].sensorData;
-        break;
-      }
-    }
-  });
+  const dataNow: Ref<SensorDataValue[]> = ref([]);
+  function verifySensorData(dataObj: SensorDataValue[]): SensorDataValue[] {
+    if (dataObj[0] === undefined) return [{ max: 0, min: 0, now: 0, stringVal: "0" }];
+    return dataObj;
+  }
+  onMounted(() => {});
   watchEffect(() => {
-    for (let i = 0; i < props.data.length; i += 1) {
-      if (props.data[i].sensorId.sensorId === props.id) {
-        dataNow.value = props.data[i].sensorData;
-        break;
-      }
-    }
+    dataNow.value = verifySensorData(props.data);
   });
 </script>
 <template>
-  <div class="date__time__container"></div>
+  <div class="date__time__container relative flex flex-row justify-center items-center h-24">
+    <span class="text-2xl"> {{ dataNow[0]?.stringVal ?? 0 }}</span>
+  </div>
 </template>
-<style scoped>
-  .date-time-container {
-    width: 100%;
-    height: 100%;
-  }
-</style>
+<style scoped></style>
