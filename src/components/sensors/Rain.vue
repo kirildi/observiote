@@ -45,7 +45,7 @@
 <template>
   <div class="rain__container relative flex flex-row justify-center items-center">
     <div class="outer w-60 h-24 p-2 rounded-b-2xl border-solid border-2 border-t-0 border-x-white"></div>
-    <div id="rain-level" class="level absolute bottom-2 w-56 bg-blue-600 rounded-b-2xl"></div>
+    <div id="rain-level" class="level absolute bottom-2 w-48 bg-blue-600 rounded-b-2xl"></div>
     <div class="rain__value absolute top-8 w-56 h-auto flex justify-center text-2xl">{{ dataNow[0]?.now ?? 0 }} mm</div>
   </div>
 </template>
