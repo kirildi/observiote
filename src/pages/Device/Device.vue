@@ -11,18 +11,14 @@
   import ButtonControl from "../../components/buttons/ButtonControl.vue";
   import SensorHistoryChart from "../../components/charts/SensorHistoryChart.vue";
   import Sensor from "../../components/Sensor.vue";
+  import { DeviceInterface } from "../../interfaces/DeviceInterface";
+  import { SensorInterface } from "../../interfaces/SensorInterface";
   import { emitterKey } from "../../globals/emitterKey";
 
   const props = defineProps<{
     id: number | string;
   }>();
 
-  function createHttpBody(devId: any) {
-    return {
-      authValue: "c373e03679e0d1a79a946b0ed81690b8366ea9f037c569506303aed56a0cbebb",
-      deviceId: devId,
-    };
-  }
   const emitter = inject(emitterKey);
 
   const globalAlertStore = useAlertsStore();
@@ -31,10 +27,10 @@
   const restClient = new RestClient();
 
   const isInfoBoxShown = ref(false);
-  const infoBoxData = ref({} as any);
+  const infoBoxData = ref<DeviceInterface[] | undefined[]>([]);
   const storageItem: string = "sensorList";
 
-  let sensorList = ref([] as any[]);
+  let sensorList = ref<SensorInterface[]>([]);
   const sensorData = ref([] as any[]);
   const actuatorContent = ref({} as any);
 
@@ -50,7 +46,7 @@
         if (!storedSensors) {
           throw { status: "000", statusText: "No stored sensors data found" };
         } else {
-          sensorList.value = JSON.parse(storedSensors);
+          sensorList.value = JSON.parse(storedSensors) as SensorInterface[];
           if (globalAlertStore.triggered) globalAlertStore.clearAlert();
         }
       })
@@ -61,12 +57,13 @@
 
   onMounted(() => {
     emitter?.emit("updateInfoButton", true);
+    if (!infoBoxData.value) infoBoxData.value = [];
 
-    infoBoxData.value = deviceStore.readByDeviceId(props.id.toString());
+    infoBoxData.value[0] = deviceStore.readByDeviceId(props.id.toString());
 
-    window.document.title = infoBoxData.value.deviceName; // Updates page title
+    window.document.title = infoBoxData?.value[0]?.deviceName ?? ""; // Updates page title
 
-    document.querySelectorAll(".tabs")[0].innerHTML = infoBoxData.value.deviceName; // Updates content header title
+    document.querySelectorAll(".tabs")[0].innerHTML = infoBoxData?.value[0]?.deviceName ?? "title"; // Updates content header title
 
     fetchSenorData();
   });
@@ -95,21 +92,21 @@
       <button class="fa fa-close info__close mb-4 p-2" @click="isInfoBoxShown = false"><span class="px-4">Close</span></button>
     </div>
     <div class="info__content flex flex-auto gap-8 flex-row">
-      <div v-if="infoBoxData.deviceImage === ''">
-        <img :id="'device-img-' + infoBoxData.deviceId" src="http://" alt=" No image found" class="w-1/3 object-cover rounded-2xl" />
+      <div v-if="infoBoxData[0]?.deviceImage === ''">
+        <img :id="'device-img-' + infoBoxData[0].deviceId" src="http://" alt=" No image found" class="w-1/3 object-cover rounded-2xl" />
       </div>
       <div v-else>
-        <img :id="'device-img-' + infoBoxData.deviceId" :src="infoBoxData.deviceImage" class="w-72 object-cover rounded-2xl" :alt="infoBoxData.deviceName" />
+        <img :id="'device-img-' + infoBoxData[0]?.deviceId" :src="infoBoxData[0]?.deviceImage" class="w-72 object-cover rounded-2xl" :alt="infoBoxData[0]?.deviceName" />
       </div>
-      <div :id="'show-info-' + infoBoxData.deviceId" class="w-1/3">
+      <div :id="'show-info-' + infoBoxData[0]?.deviceId" class="w-1/3">
         <ul>
-          <li>ID: {{ infoBoxData.deviceId }}</li>
-          <li>Date created: {{ infoBoxData.deviceCreateDate }}</li>
-          <li>Date modified:{{ infoBoxData.deviceLastModifyDate }}</li>
-          <li>Coordinates: {{ infoBoxData.deviceCoordinates }}</li>
+          <li>ID: {{ infoBoxData[0]?.deviceId }}</li>
+          <li>Date created: {{ infoBoxData[0]?.deviceCreateDate }}</li>
+          <li>Date modified:{{ infoBoxData[0]?.deviceLastModifyDate }}</li>
+          <li>Coordinates: {{ infoBoxData[0]?.deviceCoordinates }}</li>
         </ul>
       </div>
-      <div class="break-normal w-1/3">Description: {{ infoBoxData.deviceDescription }}</div>
+      <div class="break-normal w-1/3">Description: {{ infoBoxData[0]?.deviceDescription }}</div>
     </div>
   </div>
 
