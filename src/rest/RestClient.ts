@@ -80,7 +80,7 @@ export default class RestClient {
   updateSensors = (deviceId: any, storageItem: string): Promise<OIOTEResponseType> => {
     return new Promise((resolve, reject) => {
       let userCookie: UserInterface = JSON.parse(Cookies.get("user") ?? "");
-      const noUserError = { id: "error", status: "*", statusTest: "No user is found! Try re-login again." };
+      const noUserError: OIOTEResponseType = { id: "error", status: "*", statusText: "No user is found! Try re-login again." };
       if (!userCookie) {
         reject(noUserError);
       }
