@@ -5,6 +5,7 @@
 
   import RestClient from "../../rest/RestClient";
   import { OIOTEResponseType } from "../../types/OIOTEResponseType";
+  import { NoDataStoredError } from "../../classes/NoDataStoredError";
 
   import InteractiveMap from "../../components/maps/InteractiveMap.vue";
   import SensorMenu from "../../components/buttons/SensorMenu.vue";
@@ -44,14 +45,14 @@
       .then(() => {
         let storedSensors = sessionStorage.getItem(storageItem);
         if (!storedSensors) {
-          throw { status: "000", statusText: "No stored sensors data found" };
+          throw new NoDataStoredError("No stored sensors data found");
         } else {
           sensorList.value = JSON.parse(storedSensors) as SensorInterface[];
           if (globalAlertStore.triggered) globalAlertStore.clearAlert();
         }
       })
-      .catch((err) => {
-        globalAlertStore.setError({ alertCode: err.status, alertMessage: err.statusText });
+      .catch((err: OIOTEResponseType) => {
+        globalAlertStore.setError(err);
       });
   }
 

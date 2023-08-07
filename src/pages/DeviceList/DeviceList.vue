@@ -30,7 +30,7 @@
         return Promise.resolve(true);
       })
       .catch((err: OIOTEResponseType) => {
-        globalAlertStore.setError({ alertCode: err.status, alertMessage: err.statusText });
+        globalAlertStore.setError(err);
         return Promise.reject(false);
       });
   }
