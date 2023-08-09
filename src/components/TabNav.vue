@@ -39,7 +39,7 @@
       <!-- <div class="w-16 h-8">
         <img src="../../assets/logo.png" alt="img" class="" />
       </div> -->
-      <div class="w-16 h-6">
+      <div class="w-15 h-15 relative top-4">
         <span>OIOTe</span>
       </div>
     </div>
