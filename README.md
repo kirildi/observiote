@@ -18,11 +18,11 @@ Donwload or checkout the project and firstly run
 
 To start `DEV` mode run `npm run dev`
 
-Edit the config values in `.env` with your own. 
+Edit the config values in `.env` file, to match your server configuration
 
-To build the project for deployment, run `npm build` , then move the content of the generated `dist` folder, in the desired static server root directory or subdirectory of your choise. 
+To build the project for deployment, run `npm build` , then move the content of the generated `dist` folder, in the desired static server root directory, or subdirectory of your server or host provider. 
 
-### Recommended IDE Setup
+### Recommended VS Code Setup
 
 Vue 3 + Typescript + Vite
 
