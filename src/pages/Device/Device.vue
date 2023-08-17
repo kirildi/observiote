@@ -36,9 +36,9 @@
   const actuatorContent = ref({} as any);
 
   let updateSensorInterval: NodeJS.Timer;
-  const requestIntervalPeriod = 19000;
+  const waitToRequestPeriod = 19000; //in milliseconds
 
-  function fetchSenorData() {
+  function fetchSensors() {
     const getSensorsRequest: Promise<OIOTEResponseType> = restClient.updateSensors(props.id, storageItem);
 
     getSensorsRequest
@@ -66,7 +66,7 @@
 
     document.querySelectorAll(".tabs")[0].innerHTML = infoBoxData?.value[0]?.deviceName ?? "title"; // Updates content header title
 
-    fetchSenorData();
+    fetchSensors();
   });
 
   watchEffect(() => {
@@ -75,8 +75,8 @@
     });
 
     updateSensorInterval = setInterval(() => {
-      fetchSenorData();
-    }, requestIntervalPeriod);
+      fetchSensors();
+    }, waitToRequestPeriod);
   });
   // When you leave Sensor page
   onUnmounted(() => {
@@ -150,7 +150,7 @@
       <div v-if="!actuatorContent || actuatorContent.length === 0" class="controllers__area">
         <p>Device does't have actuators at this moment.</p>
       </div>
-      <div v-else class="controllers__area col-start-3 col-span-1 row-span-1">
+      <div v-else class="controllers__area">
         <div class="actuators-content">
           <button-control :id="`${id}-actuator-button`" name="button" />
           <!-- <slider name="slider" /> -->
